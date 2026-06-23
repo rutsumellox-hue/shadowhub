@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShadowHub // Actualités</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="data/css/style.css"/>
+</head>
+<body class="bg-[#070709] text-zinc-200 text-sm min-h-screen flex flex-col scanlines">
+
+<div class="top-bar">
+  <span class="live flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>SHADOW LIVE</span>
+  <div class="ml-auto flex items-center gap-4">
+    <span id="topUser" class="text-zinc-600"></span>
+    <a href="../cyberhub.html" onclick="localStorage.removeItem('cyberhub_user')" class="text-red-500 hover:underline">Quitter</a>
+  </div>
+</div>
+
+<div style="padding-top:32px" class="flex flex-1">
+  <!-- SIDEBAR -->
+  <aside class="hidden lg:block w-52 bg-[#08080a] border-r border-[#150505] py-5 px-2.5">
+    <div class="flex items-center gap-2 px-3 mb-5">
+      <i class="fa-solid fa-skull-crossbones text-lg" style="color:#ff2d55;filter:drop-shadow(0 0 8px #ff2d55)"></i>
+      <span class="font-black text-sm" style="font-family:'Space Grotesk',sans-serif">SHADOW<span style="color:#ff2d55">HUB</span></span>
+    </div>
+    <a href="index.html"    class="side-link"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    <a href="forum.html"    class="side-link"><i class="fa-solid fa-comments"></i> Forum</a>
+    <a href="news.html"     class="side-link active"><i class="fa-solid fa-bolt"></i> Actus</a>
+    <a href="catalogue.html"class="side-link"><i class="fa-solid fa-layer-group"></i> Catalogue</a>
+    <a href="mirrors.html"  class="side-link"><i class="fa-solid fa-link"></i> Mirrors</a>
+    <a href="compte.html"   class="side-link mt-3"><i class="fa-solid fa-user"></i> Compte</a>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-6 max-w-5xl mx-auto w-full space-y-8">
+
+    <div>
+      <div class="mono text-xs text-zinc-600 mb-1">// ACTUALITÉS SHADOW</div>
+      <h1 class="text-2xl font-black" style="font-family:'Space Grotesk',sans-serif">Dernières Actus <span style="color:#ff2d55">●</span></h1>
+    </div>
+
+    <!-- Filtres -->
+    <div class="flex flex-wrap gap-2">
+      <button class="cat-btn active" onclick="filterNews('all',this)">Tout</button>
+      <button class="cat-btn" onclick="filterNews('secu',this)">Sécurité</button>
+      <button class="cat-btn" onclick="filterNews('forum',this)">Forum</button>
+      <button class="cat-btn" onclick="filterNews('mirrors',this)">Mirrors</button>
+      <button class="cat-btn" onclick="filterNews('exclu',this)">Exclusifs</button>
+    </div>
+
+    <!-- Articles news -->
+    <div class="space-y-5" id="newsContainer">
+
+      <article class="widget p-6 cursor-pointer hover:border-red-900 transition" data-cat="exclu" onclick="expandNews(this)">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex gap-2 mb-2"><span class="badge badge-red">EXCLUSIF</span><span class="mono text-xs text-zinc-600">23 Juin 2026 · 14:32</span></div>
+            <h2 class="text-lg font-bold mb-2" style="font-family:'Space Grotesk',sans-serif">Nouveau guide complet : Analyse de malware en sandbox isolée</h2>
+            <p class="text-zinc-400 text-sm leading-relaxed">Un guide inédit vient d'être mis en ligne dans la section Catalogue. Il couvre l'installation de Cuckoo Sandbox, l'analyse comportementale d'un sample inconnu, l'extraction d'IOC et le reporting. Niveau avancé, accessible membres Shadow uniquement.</p>
+            <div class="hidden mt-4 pt-4 border-t border-zinc-800 text-sm text-zinc-400 leading-relaxed news-body">
+              Le guide a été rédigé par 0xVoid après 3 mois de recherche. Il inclut : configuration d'une VM Windows 10 isolée, intégration de Cuckoo 2.0, scripts d'automatisation Python pour l'extraction d'IOC, et un template de rapport prêt à l'emploi. Un deuxième volume couvrant l'analyse statique avec IDA Pro est prévu pour juillet.
+              <br><br><a href="catalogue.html" class="text-red-400 hover:underline mono text-xs">→ Accéder au guide dans le Catalogue</a>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down text-zinc-600 text-xs mt-1 flex-shrink-0 chevron transition-transform"></i>
+        </div>
+        <div class="flex items-center gap-4 mt-4 mono text-xs text-zinc-600">
+          <span><i class="fa-solid fa-eye mr-1"></i>1.2k vues</span>
+          <span><i class="fa-regular fa-heart mr-1"></i>89</span>
+          <span><i class="fa-solid fa-user mr-1"></i>0xVoid</span>
+        </div>
+      </article>
+
+      <article class="widget p-6 cursor-pointer hover:border-red-900 transition" data-cat="mirrors" onclick="expandNews(this)">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex gap-2 mb-2"><span class="badge badge-green">MIRRORS</span><span class="mono text-xs text-zinc-600">22 Juin 2026 · 09:15</span></div>
+            <h2 class="text-lg font-bold mb-2" style="font-family:'Space Grotesk',sans-serif">23 nouveaux mirrors vérifiés ajoutés — section Mirrors mise à jour</h2>
+            <p class="text-zinc-400 text-sm leading-relaxed">Suite à la disparition de 7 liens de la liste précédente, l'équipe a effectué une vérification complète et ajouté 23 nouveaux mirrors testés et fonctionnels. Les liens morts ont été retirés.</p>
+            <div class="hidden mt-4 pt-4 border-t border-zinc-800 text-sm text-zinc-400 leading-relaxed news-body">
+              La vérification a été effectuée par ModoShadow et WarezKing conjointement. Les nouveaux mirrors incluent des sources pour outils de pentest, guides PDF, et ressources warez. Chaque lien a été testé 3 fois sur 48h avant d'être validé. La liste est maintenant à 98 liens actifs sur 101.
+              <br><br><a href="mirrors.html" class="text-red-400 hover:underline mono text-xs">→ Voir la liste complète des mirrors</a>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down text-zinc-600 text-xs mt-1 flex-shrink-0 chevron transition-transform"></i>
+        </div>
+        <div class="flex items-center gap-4 mt-4 mono text-xs text-zinc-600">
+          <span><i class="fa-solid fa-eye mr-1"></i>678 vues</span>
+          <span><i class="fa-regular fa-heart mr-1"></i>42</span>
+          <span><i class="fa-solid fa-user mr-1"></i>ModoShadow</span>
+        </div>
+      </article>
+
+      <article class="widget p-6 cursor-pointer hover:border-red-900 transition" data-cat="secu" onclick="expandNews(this)">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex gap-2 mb-2"><span class="badge badge-purple">SÉCURITÉ</span><span class="mono text-xs text-zinc-600">21 Juin 2026 · 18:00</span></div>
+            <h2 class="text-lg font-bold mb-2" style="font-family:'Space Grotesk',sans-serif">Mise à jour : authentification 2FA renforcée pour la zone Shadow</h2>
+            <p class="text-zinc-400 text-sm leading-relaxed">Le système d'authentification niveau 2 a été renforcé. Le code OTP est désormais limité à 3 tentatives et expire après 15 minutes. Aucune donnée n'est stockée côté serveur.</p>
+            <div class="hidden mt-4 pt-4 border-t border-zinc-800 text-sm text-zinc-400 leading-relaxed news-body">
+              Suite à des tentatives de bruteforce détectées la semaine dernière, l'équipe de sécurité a implémenté un rate-limiter et un mécanisme de blocage temporaire. La politique de code OTP a été revue : validité 15 min (au lieu de 30), 3 tentatives max (au lieu de 5), et log côté client uniquement.
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down text-zinc-600 text-xs mt-1 flex-shrink-0 chevron transition-transform"></i>
+        </div>
+        <div class="flex items-center gap-4 mt-4 mono text-xs text-zinc-600">
+          <span><i class="fa-solid fa-eye mr-1"></i>891 vues</span>
+          <span><i class="fa-regular fa-heart mr-1"></i>61</span>
+          <span><i class="fa-solid fa-user mr-1"></i>NullPointer</span>
+        </div>
+      </article>
+
+      <article class="widget p-6 cursor-pointer hover:border-red-900 transition" data-cat="forum" onclick="expandNews(this)">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex gap-2 mb-2"><span class="badge badge-amber">FORUM</span><span class="mono text-xs text-zinc-600">20 Juin 2026 · 11:20</span></div>
+            <h2 class="text-lg font-bold mb-2" style="font-family:'Space Grotesk',sans-serif">Nouvelle section Forum : Commerces & Échanges ouverte</h2>
+            <p class="text-zinc-400 text-sm leading-relaxed">La section Commerces du forum est désormais accessible à tous les membres vérifiés. Elle permet les échanges de ressources, services, et logiciels entre membres de confiance.</p>
+            <div class="hidden mt-4 pt-4 border-t border-zinc-800 text-sm text-zinc-400 leading-relaxed news-body">
+              Les règles de la section : interdiction de vendre des données personnelles de tiers, toute arnaque signalée entraîne un ban immédiat, les transactions en crypto uniquement (XMR de préférence). Les modérateurs effectueront des vérifications hebdomadaires.
+              <br><br><a href="forum-pages/forum-commerces.html" class="text-red-400 hover:underline mono text-xs">→ Accéder à la section Commerces</a>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down text-zinc-600 text-xs mt-1 flex-shrink-0 chevron transition-transform"></i>
+        </div>
+        <div class="flex items-center gap-4 mt-4 mono text-xs text-zinc-600">
+          <span><i class="fa-solid fa-eye mr-1"></i>445 vues</span>
+          <span><i class="fa-regular fa-heart mr-1"></i>28</span>
+          <span><i class="fa-solid fa-user mr-1"></i>WarezKing</span>
+        </div>
+      </article>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  if(!localStorage.getItem('shadow_authenticated')) window.location.href='../shadow-gate.html';
+  const u = localStorage.getItem('cyberhub_username') || (localStorage.getItem('cyberhub_user')||'Anonyme').split('@')[0];
+  document.getElementById('topUser').textContent = u;
+
+  function expandNews(el){
+    const body = el.querySelector('.news-body');
+    const icon = el.querySelector('.chevron');
+    body.classList.toggle('hidden');
+    icon.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  }
+
+  function filterNews(cat, btn){
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#newsContainer article').forEach(a=>{
+      a.style.display = (cat==='all' || a.dataset.cat===cat) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

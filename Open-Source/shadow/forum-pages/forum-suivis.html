@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShadowHub // Suivis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="../data/css/style.css"/>
+</head>
+<body class="bg-[#070709] text-zinc-200 text-sm min-h-screen flex flex-col scanlines">
+
+<div class="top-bar">
+  <span class="live flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>FORUM LIVE</span>
+  <span id="onlineBadge" class="text-zinc-700 mono"></span>
+  <div class="ml-auto flex items-center gap-4">
+    <span class="mono text-zinc-600" id="currentUser"></span>
+    <a href="../../cyberhub.html" onclick="localStorage.removeItem('cyberhub_user')" class="text-red-500 hover:underline">Quitter</a>
+  </div>
+</div>
+
+<div style="padding-top:32px" class="flex flex-1">
+  <!-- SIDEBAR -->
+  <aside class="hidden lg:flex w-52 bg-[#08080a] border-r border-[#150505] py-5 px-2.5 flex-col gap-0.5 flex-shrink-0">
+    <div class="flex items-center gap-2 px-3 mb-5">
+      <i class="fa-solid fa-skull-crossbones text-lg" style="color:#ff2d55;filter:drop-shadow(0 0 8px #ff2d55)"></i>
+      <span class="font-black text-sm" style="font-family:'Space Grotesk',sans-serif">SHADOW<span style="color:#ff2d55">FORUM</span></span>
+    </div>
+    <a href="forum-general.html"       class="side-link "><i class="fa-solid fa-comments"></i> Général</a>
+    <a href="forum-demandes.html"       class="side-link "><i class="fa-solid fa-circle-question"></i> Demandes</a>
+    <a href="forum-aide.html"           class="side-link "><i class="fa-solid fa-life-ring"></i> Aide & Support</a>
+    <a href="forum-mirrors.html"        class="side-link "><i class="fa-solid fa-link"></i> Mirrors & Liens</a>
+    <a href="forum-presentations.html"  class="side-link "><i class="fa-solid fa-user-plus"></i> Présentations</a>
+    <a href="forum-commerces.html"      class="side-link "><i class="fa-solid fa-cart-shopping"></i> Commerces</a>
+    <a href="forum-abonnements.html"    class="side-link "><i class="fa-solid fa-hand-holding-dollar"></i> Abonnements</a>
+    <a href="forum-suivis.html"         class="side-link "><i class="fa-solid fa-star"></i> Suivis</a>
+    <a href="forum-tchat.html"          class="side-link "><i class="fa-solid fa-message"></i> Chat Live</a>
+    <div class="mt-3 pt-3 border-t border-zinc-900">
+      <a href="../forum.html"  class="side-link"><i class="fa-solid fa-arrow-left"></i> Retour forum</a>
+      <a href="../compte.html" class="side-link"><i class="fa-solid fa-user"></i> Compte</a>
+    </div>
+  </aside>
+
+  <!-- CONTENU -->
+  <main class="flex-1 overflow-y-auto p-6 space-y-5">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <div class="mono text-xs text-zinc-600 mb-1">// SHADOWFORUM</div>
+        <h1 class="text-2xl font-black flex items-center gap-3" style="font-family:'Space Grotesk',sans-serif">
+          <i class="fa-solid fa-star text-red-400"></i> Suivis
+        </h1>
+      </div>
+      <button onclick="showModal()" class="danger-btn"><i class="fa-solid fa-plus mr-2"></i>Nouveau Sujet</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <i class="ico fa-solid fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Rechercher..." oninput="filterPosts()" class="w-full max-w-sm bg-[#0d0d11] border border-[#1e1e28] rounded-lg px-4 py-2.5 pl-10 text-sm outline-none"/>
+    </div>
+
+    <div class="space-y-0" id="postsContainer"></div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-center gap-2 mono text-xs pt-2">
+      <span class="px-3 py-1.5 rounded-lg bg-[#0d0d11] border border-[#1e1e28] text-zinc-600">← Précédent</span>
+      <span class="px-3 py-1.5 rounded-lg" style="background:rgba(255,45,85,.15);color:#ff2d55;border:1px solid rgba(255,45,85,.3)">1</span>
+      <span class="px-3 py-1.5 rounded-lg bg-[#0d0d11] border border-[#1e1e28] text-zinc-600 cursor-pointer hover:border-red-900">2</span>
+      <span class="px-3 py-1.5 rounded-lg bg-[#0d0d11] border border-[#1e1e28] text-zinc-600 cursor-pointer hover:border-red-900">3</span>
+      <span class="px-3 py-1.5 rounded-lg bg-[#0d0d11] border border-[#1e1e28] text-zinc-600">Suivant →</span>
+    </div>
+  </main>
+</div>
+
+<!-- Modal nouveau sujet -->
+<div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div class="widget p-6 w-full max-w-lg">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-bold" style="font-family:'Space Grotesk',sans-serif">Nouveau sujet — Suivis</h3>
+      <button onclick="closeModal()" class="text-zinc-600 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="mono text-xs text-zinc-600 uppercase mb-1.5 block">Titre</label>
+        <input id="ntTitle" type="text" placeholder="Titre du sujet..." class="w-full bg-[#070709] border border-[#1e1e28] rounded-lg px-4 py-2.5 text-sm outline-none focus:border-red-500"/>
+      </div>
+      <div>
+        <label class="mono text-xs text-zinc-600 uppercase mb-1.5 block">Message</label>
+        <textarea id="ntBody" rows="5" placeholder="Contenu..." class="w-full bg-[#070709] border border-[#1e1e28] rounded-lg px-4 py-2.5 text-sm outline-none focus:border-red-500 resize-none"></textarea>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="postTopic()" class="danger-btn flex-1 py-2.5">Publier</button>
+        <button onclick="closeModal()" class="flex-1 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 text-sm">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  if(!localStorage.getItem('shadow_authenticated')) window.location.href='../../shadow-gate.html';
+  const uname = localStorage.getItem('cyberhub_username') || (localStorage.getItem('cyberhub_user')||'Anonyme').split('@')[0];
+  document.getElementById('currentUser').textContent = uname;
+  document.getElementById('onlineBadge').textContent = (1240+Math.floor(Math.random()*20))+' en ligne';
+
+  const POSTS_DATA = [
+    {title:'Discussion libre sur Suivis',author:uname,date:'à l\'instant',replies:0,views:1,tag:'New',tagClass:'badge-green'},
+    {title:'Guide complet pour débutants',author:'0xVoid',date:'il y a 2h',replies:18,views:142,tag:'Guide',tagClass:'badge-purple'},
+    {title:'Question : meilleure approche pour 2026 ?',author:'PhantomByte',date:'il y a 5h',replies:9,views:67,tag:'Question',tagClass:'badge-amber'},
+    {title:'Partage de ressources utiles',author:'DarkCracker',date:'hier',replies:23,views:198,tag:'Ressources',tagClass:'badge-red'},
+    {title:'Retour d\'expérience — cas réel',author:'GhostNet',date:'il y a 2j',replies:5,views:44,tag:'Expérience',tagClass:'badge-zinc'},
+  ];
+
+  let posts = [...POSTS_DATA];
+  function renderPosts(data){
+    const c = document.getElementById('postsContainer');
+    c.innerHTML = data.length ? '' : '<div class="mono text-xs text-zinc-600 py-8 text-center">Aucun sujet trouvé.</div>';
+    data.forEach(p=>{
+      c.innerHTML+=`<div class="forum-post p-4 flex items-center gap-4 cursor-pointer" onclick="">
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-sm line-clamp-1">${p.title}</div>
+          <div class="mono text-xs text-zinc-600 mt-0.5">par ${p.author} · ${p.date}</div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <span class="mono text-xs text-zinc-600 hidden sm:block"><i class="fa-regular fa-comments mr-1"></i>${p.replies}</span>
+          <span class="mono text-xs text-zinc-600 hidden sm:block"><i class="fa-regular fa-eye mr-1"></i>${p.views}</span>
+          <span class="badge ${p.tagClass}">${p.tag}</span>
+        </div>
+      </div>`;
+    });
+  }
+  renderPosts(posts);
+
+  function filterPosts(){
+    const q=document.getElementById('searchInput').value.toLowerCase();
+    renderPosts(q ? posts.filter(p=>p.title.toLowerCase().includes(q)) : posts);
+  }
+
+  function showModal(){ document.getElementById('modal').classList.remove('hidden'); }
+  function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
+  function postTopic(){
+    const t=document.getElementById('ntTitle').value.trim();
+    if(!t) return;
+    posts.unshift({title:t,author:uname,date:'à l\'instant',replies:0,views:1,tag:'New',tagClass:'badge-green'});
+    renderPosts(posts);
+    closeModal();
+    document.getElementById('ntTitle').value='';
+    document.getElementById('ntBody').value='';
+  }
+  document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+</script>
+</body>
+</html>

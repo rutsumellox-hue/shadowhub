@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShadowHub // Poste de pilotage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="data/css/style.css"/>
+  <style>
+    .sidebar{background:#08080a;border-right:1px solid #150505;width:220px;flex-shrink:0;}
+    .main-content{background:#070709;}
+    .widget{background:#0d0d11;border:1px solid #1a1a22;border-radius:10px;}
+    .ticker-wrap{overflow:hidden;white-space:nowrap;}
+    .ticker{display:inline-block;animation:tick 30s linear infinite;}
+    @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .terminal-log{background:#000;border:1px solid #0d2a0d;border-radius:6px;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#00ff88;line-height:1.8;max-height:200px;overflow-y:auto;}
+    .terminal-log .dim{color:#1a3a1a;}
+  </style>
+</head>
+<body class="bg-[#070709] text-zinc-200 text-sm min-h-screen flex flex-col scanlines">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span class="live flex items-center gap-1.5">
+    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>SHADOW LIVE
+  </span>
+  <span id="liveCount" class="text-zinc-700">— membres</span>
+  <div class="ticker-wrap flex-1 mx-4">
+    <span class="ticker text-zinc-700 mono text-xs">
+      SHADOWHUB v3.0 · ZONE PRIVÉE · Nouveau : guides malware analysis · Forum actif 24/7 · Mirrors à jour · Accès 2FA requis · SHADOWHUB v3.0 · ZONE PRIVÉE · Nouveau : guides malware analysis · Forum actif 24/7 · Mirrors à jour ·&nbsp;
+    </span>
+  </div>
+  <span class="ml-auto text-zinc-700 mono" id="clockTop"></span>
+  <span>|</span>
+  <span id="topUser" class="text-zinc-500"></span>
+  <span>|</span>
+  <a href="../cyberhub.html" onclick="localStorage.removeItem('cyberhub_user')" class="text-red-500 hover:underline">Quitter</a>
+</div>
+
+<div class="flex flex-1" style="padding-top:32px">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar hidden lg:flex flex-col py-5 px-2.5 gap-0.5 overflow-y-auto">
+    <div class="flex items-center gap-2 px-3 mb-5">
+      <i class="fa-solid fa-skull-crossbones text-xl" style="color:var(--red,#ff2d55);filter:drop-shadow(0 0 8px #ff2d55)"></i>
+      <span class="font-black text-base" style="font-family:'Space Grotesk',sans-serif">SHADOW<span style="color:#ff2d55">HUB</span></span>
+    </div>
+
+    <a href="forum.html"    class="side-link"><i class="fa-solid fa-comments"></i> Forum</a>
+    <a href="news.html"     class="side-link"><i class="fa-solid fa-bolt"></i> Actus</a>
+    <a href="catalogue.html"class="side-link"><i class="fa-solid fa-layer-group"></i> Catalogue</a>
+    <a href="squads.html"   class="side-link"><i class="fa-solid fa-users"></i> Squads</a>
+    <a href="mirrors.html"  class="side-link"><i class="fa-solid fa-link"></i> Mirrors</a>
+
+    <div class="mt-3 pt-3 border-t border-zinc-900">
+      <a href="compte.html" class="side-link"><i class="fa-solid fa-user"></i> Mon compte</a>
+      <a href="../dashboard.html" class="side-link"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    </div>
+
+    <!-- Terminal mini -->
+    <div class="mt-auto px-1">
+      <div class="terminal-log" id="termLog">
+        <div class="dim">// LOG SYSTÈME</div>
+        <div id="logLines"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 overflow-y-auto p-5 space-y-5">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="mono text-xs text-zinc-600 mb-1">// POSTE DE PILOTAGE</div>
+        <h1 class="text-2xl font-black" style="font-family:'Space Grotesk',sans-serif">
+          SHADOW<span style="color:#ff2d55">HUB</span>
+        </h1>
+      </div>
+      <div class="flex gap-2">
+        <a href="forum.html" class="danger-btn py-2 px-4 text-xs"><i class="fa-solid fa-comments mr-1.5"></i>Forum</a>
+        <a href="news.html"  class="danger-btn py-2 px-4 text-xs" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)"><i class="fa-solid fa-bolt mr-1.5"></i>Actus</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="widget p-4 text-center">
+        <div class="stat-num" id="statM">12 458</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Membres</div>
+      </div>
+      <div class="widget p-4 text-center">
+        <div class="stat-num">3 210</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Sujets</div>
+      </div>
+      <div class="widget p-4 text-center">
+        <div class="stat-num" style="color:#00ff88;text-shadow:0 0 16px rgba(0,255,136,.4)" id="statOnline">—</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">En ligne</div>
+      </div>
+      <div class="widget p-4 text-center">
+        <div class="stat-num">847</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Ressources</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+      <!-- Posts chauds -->
+      <div class="widget p-5 lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold" style="font-family:'Space Grotesk',sans-serif">Posts chauds</h2>
+          <a href="forum.html" class="mono text-xs text-zinc-600 hover:text-red-400 transition">tout voir →</a>
+        </div>
+        <div class="space-y-0" id="hotPosts"></div>
+      </div>
+
+      <!-- Membres online -->
+      <div class="widget p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold" style="font-family:'Space Grotesk',sans-serif">En ligne</h2>
+          <span class="badge badge-green mono">LIVE</span>
+        </div>
+        <div id="onlineMembers" class="space-y-2"></div>
+      </div>
+
+    </div>
+
+    <!-- Dernières actus -->
+    <div class="widget p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold" style="font-family:'Space Grotesk',sans-serif">Actualités récentes</h2>
+        <a href="news.html" class="mono text-xs text-zinc-600 hover:text-red-400 transition">tout voir →</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="recentNews"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  if(!localStorage.getItem('shadow_authenticated')) window.location.href='../shadow-gate.html';
+  const uname = localStorage.getItem('cyberhub_username') || (localStorage.getItem('cyberhub_user')||'Anonyme').split('@')[0];
+  document.getElementById('topUser').textContent = uname;
+
+  // Clock
+  function tick(){document.getElementById('clockTop').textContent=new Date().toLocaleTimeString('fr-FR');}
+  tick(); setInterval(tick,1000);
+
+  // Online
+  const onlineEl = document.getElementById('statOnline');
+  const liveEl   = document.getElementById('liveCount');
+  function updateOnline(){const n=1240+Math.floor(Math.random()*20); onlineEl.textContent=n; liveEl.textContent=n+' membres';}
+  updateOnline(); setInterval(updateOnline,5000);
+
+  // Hot posts
+  const posts=[
+    {title:'Reverse Engineering 101 — Ghidra',author:'0xVoid',replies:34,views:240,tag:'Sécu',tagClass:'badge-red'},
+    {title:'SQL Injection Union-Based — guide complet',author:'PhantomByte',replies:12,views:98,tag:'Web',tagClass:'badge-purple'},
+    {title:'Stack Tor + VPN + Tails OS 2026',author:'GhostNet',replies:22,views:175,tag:'Anon',tagClass:'badge-green'},
+    {title:'Aircrack-ng WPA3 — encore possible ?',author:'DarkCracker',replies:7,views:56,tag:'WiFi',tagClass:'badge-amber'},
+  ];
+  const hp = document.getElementById('hotPosts');
+  posts.forEach(p=>{
+    hp.innerHTML+=`<div class="forum-post p-3 flex items-center gap-3 cursor-pointer" onclick="location.href='forum.html'">
+      <div class="flex-1 min-w-0">
+        <div class="font-medium text-sm line-clamp-1">${p.title}</div>
+        <div class="mono text-xs text-zinc-600 mt-0.5">par ${p.author} · ${p.replies} rép · ${p.views} vues</div>
+      </div>
+      <span class="badge ${p.tagClass} flex-shrink-0">${p.tag}</span>
+    </div>`;
+  });
+
+  // Online members
+  const members=['0xVoid','WarezKing','DarkCracker','ModoShadow','PhantomByte','GhostNet','NullPointer'];
+  const ranks  =['Shadow','VIP','Membre','Modo','Membre','Membre','VIP'];
+  const rankCls=['rank-shadow','rank-vip','rank-member','rank-modo','rank-member','rank-member','rank-vip'];
+  const om = document.getElementById('onlineMembers');
+  members.forEach((m,i)=>{
+    om.innerHTML+=`<div class="user-online"><span class="dot pulse-dot"></span><span class="flex-1 text-xs">${m}</span><span class="rank ${rankCls[i]}">${ranks[i]}</span></div>`;
+  });
+
+  // Recent news
+  const news=[
+    {title:'Nouveau guide malware analysis disponible',tag:'EXCLUSIF',tagClass:'badge-red',date:'Il y a 2h'},
+    {title:'23 nouveaux mirrors vérifiés ajoutés',tag:'MIRRORS',tagClass:'badge-green',date:'Il y a 5h'},
+    {title:'Mise à jour sécurité : 2FA renforcé',tag:'SÉCU',tagClass:'badge-purple',date:'Hier'},
+  ];
+  const rn = document.getElementById('recentNews');
+  news.forEach(n=>{
+    rn.innerHTML+=`<div class="news-item hot cursor-pointer hover:opacity-90 transition" onclick="location.href='news.html'" style="padding-left:14px">
+      <div class="flex items-center gap-2 mb-1.5"><span class="badge ${n.tagClass}">${n.tag}</span><span class="mono text-xs text-zinc-700">${n.date}</span></div>
+      <div class="text-sm font-medium">${n.title}</div>
+    </div>`;
+  });
+
+  // Terminal log
+  const logLines=['[BOOT] ShadowHub v3.0 initialisé','[AUTH] Utilisateur '+uname+' connecté','[SYS] 2FA validé — niveau 2 accordé','[NET] Mirrors : 23 en ligne / 2 hors ligne','[FORUM] 12 nouveaux sujets depuis ta dernière visite'];
+  const logEl = document.getElementById('logLines');
+  let i=0;
+  function addLog(){
+    if(i<logLines.length){
+      const d=document.createElement('div');
+      d.textContent=logLines[i++];
+      logEl.appendChild(d);
+      logEl.parentElement.scrollTop=9999;
+    }
+  }
+  let delay=300;
+  logLines.forEach((_,idx)=>{setTimeout(addLog,delay+=idx*400);});
+</script>
+</body>
+</html>

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShadowHub // Squads (Discord-like Ultra Complet 99999 lignes)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="data/css/style.css" />
+    <link rel="stylesheet" href="data/css/squads.css" />
+</head>
+
+<body class="bg-[#0a0a0f] text-zinc-200 text-sm h-screen flex flex-col">
+
+    <!-- ========== TOP BAR ========== -->
+    <div
+        class="h-8 bg-black border-b border-red-900 flex items-center px-4 text-[10px] uppercase tracking-widest gap-6 z-50">
+        <span class="text-red-500 flex items-center gap-2"><span
+                class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>SQUADS LIVE</span>
+        <span>99999 MESSAGES CHARGEABLES</span>
+        <span class="ml-auto">SESSION : <span id="currentUserDisplay">ModoShadow</span> | <a href="index.html"
+                class="text-red-400 hover:underline" onclick="logout()">Déconnexion</a></span>
+        <button onclick="toggleNotificationsPanel()" class="relative text-zinc-400 hover:text-white ml-2">
+            <i class="fa-solid fa-bell"></i>
+            <span id="notificationCount" class="notification-badge hidden">0</span>
+        </button>
+        <button onclick="toggleFriendsPanel()" class="text-zinc-400 hover:text-white ml-2"><i
+                class="fa-solid fa-user-group"></i></button>
+    </div>
+
+    <!-- ========== MAIN LAYOUT ========== -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- ===== SIDEBAR GAUCHE : SQUADS & CANAUX ===== -->
+        <aside class="w-72 bg-[#0e0e16] border-r border-zinc-800 flex flex-col flex-shrink-0">
+            <div class="p-4 font-bold text-xl text-red-400 flex items-center gap-2 border-b border-zinc-800">
+                <i class="fa-solid fa-skull-crossbones"></i> SHADOWHUB SQUADS
+            </div>
+            <div class="p-3 border-b border-zinc-800 flex gap-2">
+                <button onclick="openCreateSquadModal()"
+                    class="flex-1 bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg text-xs font-medium">Créer</button>
+                <button onclick="openJoinSquadModal()"
+                    class="flex-1 bg-zinc-700 hover:bg-zinc-600 px-3 py-2 rounded-lg text-xs font-medium">Rejoindre</button>
+                <button onclick="openDiscoverSquadsModal()"
+                    class="flex-1 bg-zinc-700 hover:bg-zinc-600 px-3 py-2 rounded-lg text-xs font-medium">Découvrir</button>
+            </div>
+            <div id="squadListContainer"
+                class="p-2 border-b border-zinc-800 space-y-1 max-h-40 overflow-y-auto scrollbar-thin"></div>
+            <div class="flex-1 overflow-y-auto scrollbar-thin p-2 space-y-1" id="channelListContainer"></div>
+            <div class="p-3 border-t border-zinc-800 flex items-center gap-2">
+                <img src="https://picsum.photos/seed/modo/40/40" class="rounded-full w-8 h-8" alt="avatar">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate" id="currentUsername">ModoShadow</p>
+                    <p class="text-xs text-zinc-500">#0001</p>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full" id="userStatusDot" style="background: #34d399;"></span>
+                        <span class="text-xs text-zinc-500" id="currentStatus">En ligne</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-gear text-zinc-500 hover:text-white cursor-pointer"
+                    onclick="openUserSettings()"></i>
+                <i class="fa-solid fa-microphone text-zinc-500 hover:text-white cursor-pointer"
+                    onclick="toggleMute()"></i>
+                <i class="fa-solid fa-headphones text-zinc-500 hover:text-white cursor-pointer"
+                    onclick="toggleDeafen()"></i>
+            </div>
+        </aside>
+
+        <!-- ===== ZONE PRINCIPALE ===== -->
+        <div class="flex-1 flex flex-col bg-[#0a0a0f] min-w-0">
+            <div class="h-14 border-b border-zinc-800 flex items-center px-4 gap-3">
+                <span class="text-xl text-red-400 font-bold" id="currentChannelPrefix">#</span>
+                <span class="text-xl font-bold" id="currentChannelName">général-discussion</span>
+                <span class="text-zinc-500 text-sm" id="memberCount">| 0 membres</span>
+                <div class="ml-auto flex gap-3 text-zinc-400">
+                    <i class="fa-solid fa-hashtag hover:text-white cursor-pointer"></i>
+                    <i class="fa-solid fa-thumbtack hover:text-white cursor-pointer" onclick="togglePinned()"></i>
+                    <i class="fa-solid fa-users hover:text-white cursor-pointer" onclick="toggleMemberList()"></i>
+                    <i class="fa-solid fa-phone hover:text-white cursor-pointer" onclick="startVoiceCall()"></i>
+                    <i class="fa-solid fa-expand hover:text-white cursor-pointer" onclick="toggleFullScreen()"></i>
+                    <input type="text" placeholder="Rechercher..."
+                        class="bg-zinc-800 border border-zinc-700 rounded px-3 py-1 text-xs outline-none focus:border-red-500 w-40"
+                        id="searchMessages" oninput="filterMessages()">
+                </div>
+            </div>
+
+            <div id="progressBarContainer" class="h-2 bg-zinc-800">
+                <div id="loadProgress" class="h-full bg-red-600" style="width: 0%"></div>
+            </div>
+
+            <div id="voiceCallBar" class="hidden voice-call-bar mx-4 my-2 flex items-center gap-4">
+                <span class="text-emerald-400 text-sm">Appel vocal - <span id="voiceParticipantCount">0</span>
+                    participants</span>
+                <div id="voiceParticipants" class="flex gap-1"></div>
+                <button onclick="leaveVoiceCall()" class="text-red-400 hover:text-red-500 ml-auto">Quitter</button>
+            </div>
+
+            <div id="messageContainer" class="flex-1 overflow-y-auto scrollbar-thin p-4 space-y-1"></div>
+
+            <div class="h-16 border-t border-zinc-800 flex items-center px-4 gap-3">
+                <button class="text-zinc-400 hover:text-white" onclick="alert('Ajouter une pièce jointe')"><i class="fa-solid fa-plus-circle text-xl"></i></button>
+                <input type="text" id="messageInput" placeholder="Écrivez votre message..."
+                    class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 outline-none focus:border-red-500 text-sm"
+                    onkeydown="handleMessageKey(event)">
+                <button onclick="sendMessage()"
+                    class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-medium">Envoyer</button>
+            </div>
+        </div>
+
+        <!-- ===== SIDEBAR DROITE : MEMBRES ===== -->
+        <aside id="memberSidebar"
+            class="w-56 bg-[#0e0e16] border-l border-zinc-800 flex-shrink-0 hidden lg:flex flex-col overflow-y-auto scrollbar-thin">
+            <div class="p-3 text-xs text-zinc-500 uppercase tracking-widest sticky top-0 bg-[#0e0e16] z-10">En ligne —
+                <span id="onlineCount">0</span></div>
+            <div id="memberList" class="flex-1"></div>
+        </aside>
+
+        <!-- ===== PANNEAUX NOTIFICATIONS ET AMIS ===== -->
+        <div id="notificationsPanel"
+            class="hidden absolute right-0 top-8 w-80 bg-zinc-900 border-l border-zinc-700 h-full z-40 p-4 overflow-y-auto scrollbar-thin">
+            <h3 class="text-red-400 font-bold mb-4">Notifications</h3>
+            <div id="notificationsList" class="space-y-2"></div>
+        </div>
+        <div id="friendsPanel"
+            class="hidden absolute right-0 top-8 w-80 bg-zinc-900 border-l border-zinc-700 h-full z-40 p-4 overflow-y-auto scrollbar-thin">
+            <h3 class="text-red-400 font-bold mb-4">Amis</h3>
+            <div id="friendsList" class="space-y-1"></div>
+        </div>
+    </div>
+
+    <!-- ========== MODALES ========== -->
+    <!-- Créer un Squad -->
+    <div id="createSquadModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Créer un Squad</h2>
+            <input type="text" id="newSquadName" placeholder="Nom du squad"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+            <select id="newSquadType"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+                <option value="public">Public</option>
+                <option value="private">Privé</option>
+            </select>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('createSquadModal')" class="px-4 py-2 bg-zinc-700 rounded">Annuler</button>
+                <button onclick="createSquad()" class="px-4 py-2 bg-red-600 rounded">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejoindre un Squad -->
+    <div id="joinSquadModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Rejoindre un Squad</h2>
+            <input type="text" id="inviteCode" placeholder="Code d'invitation"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('joinSquadModal')" class="px-4 py-2 bg-zinc-700 rounded">Annuler</button>
+                <button onclick="joinSquad()" class="px-4 py-2 bg-red-600 rounded">Rejoindre</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Découvrir des Squads publics -->
+    <div id="discoverSquadsModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-[500px] max-h-[80vh] overflow-y-auto border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Découvrir des Squads publics</h2>
+            <div id="discoverSquadsList" class="space-y-2"></div>
+            <button onclick="closeModal('discoverSquadsModal')"
+                class="mt-4 w-full bg-zinc-700 rounded py-2">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Paramètres utilisateur -->
+    <div id="userSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Paramètres utilisateur</h2>
+            <label class="text-xs text-zinc-400">Nom d'utilisateur</label>
+            <input type="text" id="settingsUsername"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+            <label class="text-xs text-zinc-400">Avatar URL</label>
+            <input type="text" id="settingsAvatar"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+            <label class="text-xs text-zinc-400">Statut</label>
+            <select id="settingsStatus"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+                <option value="online">🟢 En ligne</option>
+                <option value="idle">🟡 Occupé</option>
+                <option value="dnd">🔴 Ne pas déranger</option>
+                <option value="invisible">⚫ Invisible</option>
+            </select>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('userSettingsModal')" class="px-4 py-2 bg-zinc-700 rounded">Annuler</button>
+                <button onclick="saveUserSettings()" class="px-4 py-2 bg-red-600 rounded">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paramètres du Squad -->
+    <div id="squadSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Paramètres du Squad</h2>
+            <div class="space-y-3" id="squadSettingsContent"></div>
+            <div class="flex justify-end gap-2 mt-4">
+                <button onclick="closeModal('squadSettingsModal')" class="px-4 py-2 bg-zinc-700 rounded">Fermer</button>
+                <button onclick="deleteSquad()" class="px-4 py-2 bg-red-800 rounded">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Créer un salon -->
+    <div id="createChannelModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Créer un salon</h2>
+            <input type="text" id="newChannelName" placeholder="Nom du salon"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+            <select id="newChannelType"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+                <option value="text">Textuel</option>
+                <option value="voice">Vocal</option>
+                <option value="files">Fichiers / Trade</option>
+            </select>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('createChannelModal')"
+                    class="px-4 py-2 bg-zinc-700 rounded">Annuler</button>
+                <button onclick="createChannel()" class="px-4 py-2 bg-red-600 rounded">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Créer une section -->
+    <div id="createSectionModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Créer une section</h2>
+            <input type="text" id="newSectionName" placeholder="Nom de la section"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+            <select id="newSectionType"
+                class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-3 outline-none">
+                <option value="text">Textuelle</option>
+                <option value="voice">Vocale</option>
+                <option value="trade">Trade / Échange</option>
+            </select>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('createSectionModal')"
+                    class="px-4 py-2 bg-zinc-700 rounded">Annuler</button>
+                <button onclick="createSection()" class="px-4 py-2 bg-red-600 rounded">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profil d'un membre -->
+    <div id="memberProfileModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700 profile-modal">
+            <div class="text-center">
+                <img id="profileAvatar" src="" class="rounded-full w-20 h-20 mx-auto mb-3">
+                <h3 id="profileName" class="text-xl font-bold"></h3>
+                <p id="profileStatus" class="text-sm text-zinc-400"></p>
+                <div id="profileBadges" class="flex justify-center gap-2 mt-2"></div>
+            </div>
+            <div class="mt-4 space-y-2 text-sm">
+                <p><span class="text-zinc-500">ID:</span> <span id="profileId"></span></p>
+                <p><span class="text-zinc-500">Rôle:</span> <span id="profileRole"></span></p>
+                <p><span class="text-zinc-500">Squad actuel:</span> <span id="profileSquad"></span></p>
+                <p><span class="text-zinc-500">Messages:</span> <span id="profileMessages"></span></p>
+                <button id="toggleFriendBtn" class="mt-2 bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs"
+                    onclick="toggleFriend()">Ajouter aux amis</button>
+                <button id="blockUserBtn" class="mt-2 bg-red-800 hover:bg-red-900 px-3 py-1 rounded text-xs ml-2"
+                    onclick="toggleBlock()">Bloquer</button>
+                <button onclick="startPrivateChat()"
+                    class="mt-2 bg-zinc-600 hover:bg-zinc-500 px-3 py-1 rounded text-xs ml-2">Message privé</button>
+            </div>
+            <button onclick="closeModal('memberProfileModal')"
+                class="mt-4 w-full bg-zinc-700 rounded py-2">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Gestion des rôles -->
+    <div id="rolesModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Gestion des rôles</h2>
+            <div id="rolesList" class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin"></div>
+            <button onclick="addRole()"
+                class="mt-3 w-full bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg text-sm">Ajouter un rôle</button>
+            <button onclick="closeModal('rolesModal')" class="mt-2 w-full bg-zinc-700 rounded py-2">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Modal de détail d'un message -->
+    <div id="messageDetailModal" class="fixed inset-0 z-50 flex items-center justify-center hidden modal-overlay">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-96 border border-zinc-700">
+            <h2 class="text-xl font-bold mb-4">Détails du message</h2>
+            <p id="messageDetailContent"></p>
+            <button onclick="reportMessage()" class="mt-2 bg-red-800 px-3 py-1 rounded text-xs">Signaler ce
+                message</button>
+            <button onclick="closeModal('messageDetailModal')"
+                class="mt-4 w-full bg-zinc-700 rounded py-2">Fermer</button>
+        </div>
+    </div>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script>
+        // ==================== ÉTAT GLOBAL ====================
+        let currentUser = { name: 'ModoShadow', avatar: 'https://picsum.photos/seed/modo/40/40', status: 'online', id: '0001' };
+        let squads = [];
+        let activeSquadId = null;
+        let activeChannelId = null;
+        let messagesCache = {};
+        let voiceCallActive = false;
+        let voiceInterval = null;
+        let friends = [];
+        let blockedUsers = [];
+        let notifications = [];
+        // Réactions : { messageId: { emoji: count } }
+        let currentReactionCounts = {};
+        let currentProfileMember = null;
+        // Pour la barre d'émojis ouverte
+        let activeEmojiPicker = null;
+
+        const demoUsers = [
+            { name: "DarkCracker", color: "text-red-400", avatar: "https://picsum.photos/seed/dark/40/40", status: "online", id: "0002" },
+            { name: "WarezKing", color: "text-purple-400", avatar: "https://picsum.photos/seed/warez/40/40", status: "idle", id: "0003" },
+            { name: "AnonUser99", color: "text-amber-400", avatar: "https://picsum.photos/seed/anon/40/40", status: "online", id: "0004" },
+            { name: "CrackMaster", color: "text-emerald-400", avatar: "https://picsum.photos/seed/master/40/40", status: "dnd", id: "0005" },
+            { name: "NightWolf", color: "text-zinc-300", avatar: "https://picsum.photos/seed/night/40/40", status: "invisible", id: "0006" },
+        ];
+
+        function init() {
+            const defaultSquad = {
+                id: 'squad1',
+                name: 'Général',
+                type: 'public',
+                channels: [
+                    { id: 'welcome', name: 'bienvenue', type: 'text', section: 'general' },
+                    { id: 'general', name: 'général-discussion', type: 'text', section: 'general' },
+                    { id: 'cracks', name: 'partage-liens', type: 'text', section: 'community' },
+                    { id: 'support', name: 'support', type: 'text', section: 'community' },
+                    { id: 'voice-chat', name: 'Vocal Général', type: 'voice', section: 'community' },
+                    { id: 'trade-chan', name: 'trade-zone', type: 'files', section: 'trade' }
+                ],
+                sections: { general: 'Général', community: 'Communauté', trade: 'Trade / Échanges' },
+                members: [currentUser.name, 'DarkCracker', 'WarezKing', 'AnonUser99'],
+                roles: { admin: [currentUser.name], premium: ['DarkCracker'] },
+                inviteCode: 'SH-0001'
+            };
+            squads.push(defaultSquad);
+            generateBulkMessages('general', 10000);
+            activeSquadId = 'squad1';
+            activeChannelId = 'general';
+            renderAll();
+            startVoiceCall();
+            loadData();
+        }
+
+        function generateBulkMessages(channelId, count) {
+            if (!messagesCache[channelId]) messagesCache[channelId] = [];
+            const texts = ["Salut tout le monde !", "Quoi de neuf ?", "Nouveau crack dispo.", "Merci !", "Testé, OK.", "Besoin d'aide.", "VPN recommandé ?", "Super boulot !", "J'ai un problème avec l'installation.", "Qui peut m'aider ?", "Le site est super.", "Merci pour le partage.", "Testé et approuvé.", "Les mirrors sont rapides.", "Bienvenue aux nouveaux !", "Attention aux faux sites.", "Partagez vos découvertes.", "Je recommande ce logiciel.", "Pensez à utiliser un VPN.", "Bonne journée à tous !"];
+            const now = Date.now();
+            for (let i = 0; i < count; i++) {
+                const user = demoUsers[Math.floor(Math.random() * demoUsers.length)];
+                const msg = texts[Math.floor(Math.random() * texts.length)];
+                const timestamp = new Date(now - Math.floor(Math.random() * 86400000 * 7)).toISOString();
+                messagesCache[channelId].push({ user: { ...user }, content: msg, timestamp, id: i });
+            }
+            messagesCache[channelId].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        }
+
+        function renderAll() { renderSquadList(); renderChannelList(); renderMessages(); renderMembers(); updateHeader(); }
+        function getCurrentSquad() { return squads.find(s => s.id === activeSquadId); }
+        function getCurrentChannel() { return getCurrentSquad()?.channels.find(c => c.id === activeChannelId); }
+
+        function renderSquadList() {
+            const container = document.getElementById('squadListContainer');
+            container.innerHTML = squads.map(squad => `
+                <button class="w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-zinc-800 ${activeSquadId === squad.id ? 'bg-red-950 text-red-400' : ''}"
+                    onclick="selectSquad('${squad.id}')" oncontextmenu="event.preventDefault(); openSquadSettings('${squad.id}')">
+                    <i class="fa-solid fa-users"></i> ${squad.name}
+                    <span class="text-xs text-zinc-500 ml-auto">${squad.type === 'private' ? '🔒' : '🌐'}</span>
+                </button>`).join('');
+        }
+
+        function renderChannelList() {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            const container = document.getElementById('channelListContainer');
+            let html = `<div class="text-xs text-zinc-500 uppercase px-2 mb-2 flex items-center justify-between">Canaux <button onclick="openCreateSectionModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-folder-plus text-xs"></i></button></div>`;
+            const bySection = {};
+            squad.channels.forEach(ch => {
+                const sec = ch.section || 'default';
+                if (!bySection[sec]) bySection[sec] = [];
+                bySection[sec].push(ch);
+            });
+            Object.keys(squad.sections).forEach(secId => {
+                html += `<div class="section-header flex justify-between items-center" onclick="toggleSection('${secId}')">
+                    <span>${squad.sections[secId]}</span>
+                    <button onclick="deleteSection('${secId}'); event.stopPropagation();" class="text-red-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+                (bySection[secId] || []).forEach(ch => {
+                    html += `<button class="channel w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-zinc-800 ${activeChannelId === ch.id ? 'bg-red-950 text-red-400' : ''}" onclick="selectChannel('${ch.id}')">
+                        <span class="text-zinc-400">${ch.type === 'voice' ? '🔊' : ch.type === 'files' ? '📁' : '#'}</span> ${ch.name}
+                    </button>`;
+                });
+            });
+            container.innerHTML = html;
+        }
+
+        function selectSquad(id) {
+            activeSquadId = id;
+            activeChannelId = squads.find(s => s.id === id)?.channels[0]?.id || null;
+            renderAll();
+            if (voiceCallActive) leaveVoiceCall();
+        }
+        function selectChannel(id) {
+            activeChannelId = id;
+            const channel = getCurrentChannel();
+            if (channel && channel.type === 'voice') startVoiceCall();
+            else if (voiceCallActive) leaveVoiceCall();
+            renderChannelList(); renderMessages(); updateHeader();
+        }
+        function updateHeader() {
+            const squad = getCurrentSquad();
+            const channel = getCurrentChannel();
+            document.getElementById('currentChannelName').textContent = channel?.name || 'inconnu';
+            document.getElementById('memberCount').textContent = `| ${squad?.members.length || 0} membres`;
+            document.getElementById('currentChannelPrefix').textContent = channel?.type === 'voice' ? '🔊' : channel?.type === 'files' ? '📁' : '#';
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = '';
+            const msgs = messagesCache[activeChannelId] || [];
+            const displayed = msgs.slice(-200);
+            if (msgs.length > 200) {
+                const loadMore = document.createElement('button');
+                loadMore.textContent = `Afficher plus (${msgs.length - 200} messages)`;
+                loadMore.className = 'w-full text-center py-2 text-zinc-400 hover:text-white text-sm';
+                loadMore.onclick = () => { /* Logique de pagination simplifiée */ };
+                container.appendChild(loadMore);
+            }
+            displayed.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'message flex gap-3 p-2 rounded hover:bg-zinc-800/30';
+                // Réactions existantes pour ce message
+                const reactions = currentReactionCounts[msg.id] || {};
+                let reactionsHtml = '';
+                for (const [emoji, count] of Object.entries(reactions)) {
+                    if (count > 0) {
+                        reactionsHtml += `<button class="reaction-btn text-xs bg-zinc-800 rounded px-1 py-0.5" data-emoji="${emoji}" data-msgid="${msg.id}" onclick="addSpecificReaction(${msg.id}, '${emoji}')">${emoji} ${count}</button>`;
+                    }
+                }
+                div.innerHTML = `
+                    <img src="${msg.user.avatar}" class="rounded-full w-10 h-10 mt-1" onerror="this.src='https://picsum.photos/40/40'">
+                    <div class="flex-1">
+                        <div class="flex items-baseline gap-2">
+                            <span class="font-semibold ${msg.user.color}">${msg.user.name}</span>
+                            <span class="text-xs text-zinc-500">${new Date(msg.timestamp).toLocaleString('fr-FR')}</span>
+                        </div>
+                        <p>${msg.content}</p>
+                        <div class="flex gap-1 mt-1 items-center">
+                            ${reactionsHtml}
+                            <button class="reaction-add text-xs bg-zinc-800 rounded px-1 py-0.5 flex items-center" onclick="openEmojiPicker(event, ${msg.id})">
+                                <i class="fa-solid fa-face-smile text-zinc-400"></i> +
+                            </button>
+                            <div class="emoji-picker" id="picker-${msg.id}">
+                                <button class="reaction-emoji" onclick="addReaction(${msg.id}, '👍')">👍</button>
+                                <button class="reaction-emoji" onclick="addReaction(${msg.id}, '❤️')">❤️</button>
+                                <button class="reaction-emoji" onclick="addReaction(${msg.id}, '😂')">😂</button>
+                                <button class="reaction-emoji" onclick="addReaction(${msg.id}, '😮')">😮</button>
+                                <button class="reaction-emoji" onclick="addReaction(${msg.id}, '😢')">😢</button>
+                                <button class="reaction-emoji" onclick="addReaction(${msg.id}, '😡')">😡</button>
+                            </div>
+                        </div>
+                    </div>`;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+            // Attacher les événements de souris pour cacher le picker quand on clique ailleurs
+            document.addEventListener('click', handleGlobalClick);
+        }
+
+        function openEmojiPicker(event, msgId) {
+            event.stopPropagation();
+            const picker = document.getElementById(`picker-${msgId}`);
+            if (!picker) return;
+            // Cacher tout autre picker ouvert
+            document.querySelectorAll('.emoji-picker.visible').forEach(p => p.classList.remove('visible'));
+            picker.classList.toggle('visible');
+            activeEmojiPicker = picker.classList.contains('visible') ? msgId : null;
+        }
+
+        function handleGlobalClick(e) {
+            if (activeEmojiPicker) {
+                const picker = document.getElementById(`picker-${activeEmojiPicker}`);
+                if (picker && !picker.contains(e.target) && !e.target.classList.contains('reaction-add')) {
+                    picker.classList.remove('visible');
+                    activeEmojiPicker = null;
+                }
+            }
+        }
+
+        function addReaction(msgId, emoji) {
+            if (!currentReactionCounts[msgId]) currentReactionCounts[msgId] = {};
+            if (!currentReactionCounts[msgId][emoji]) currentReactionCounts[msgId][emoji] = 0;
+            currentReactionCounts[msgId][emoji]++;
+            // Fermer le picker
+            const picker = document.getElementById(`picker-${msgId}`);
+            if (picker) picker.classList.remove('visible');
+            activeEmojiPicker = null;
+            renderMessages();
+            saveData();
+        }
+
+        function addSpecificReaction(msgId, emoji) {
+            // Même comportement que cliquer sur un émoji existant
+            if (!currentReactionCounts[msgId]) currentReactionCounts[msgId] = {};
+            if (!currentReactionCounts[msgId][emoji]) currentReactionCounts[msgId][emoji] = 0;
+            currentReactionCounts[msgId][emoji]++;
+            renderMessages();
+            saveData();
+        }
+
+        function renderMembers() {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            document.getElementById('onlineCount').textContent = squad.members.length;
+            const list = document.getElementById('memberList');
+            list.innerHTML = squad.members.map(memberName => {
+                const user = demoUsers.find(u => u.name === memberName) || { name: memberName, color: 'text-zinc-300', avatar: `https://picsum.photos/seed/${memberName}/30/30`, status: 'invisible' };
+                const dotColor = user.status === 'online' ? '#34d399' : user.status === 'idle' ? '#fbbf24' : user.status === 'dnd' ? '#ef4444' : '#6b7280';
+                const isAdmin = squad.roles?.admin?.includes(memberName);
+                const isPremium = squad.roles?.premium?.includes(memberName);
+                return `<div class="user-list-item flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-zinc-800 rounded" onclick="openMemberProfile('${memberName}')">
+                    <div class="relative">
+                        <img src="${user.avatar}" class="rounded-full w-8 h-8" onerror="this.src='https://picsum.photos/30/30'">
+                        <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#0e0e16]" style="background: ${dotColor};"></span>
+                    </div>
+                    <span class="text-sm">${memberName} ${isAdmin ? '<span class="text-red-400 text-xs">(Admin)</span>' : ''} ${isPremium ? '<span class="badge badge-premium">Premium</span>' : ''}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function openMemberProfile(name) {
+            currentProfileMember = name;
+            const user = demoUsers.find(u => u.name === name) || { name, avatar: `https://picsum.photos/seed/${name}/30/30`, status: 'invisible', id: '?' };
+            document.getElementById('profileAvatar').src = user.avatar;
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileStatus').textContent = user.status;
+            document.getElementById('profileBadges').innerHTML = '';
+            const squad = getCurrentSquad();
+            if (squad?.roles.admin?.includes(name)) document.getElementById('profileBadges').innerHTML += '<span class="badge badge-admin">Admin</span>';
+            if (squad?.roles.premium?.includes(name)) document.getElementById('profileBadges').innerHTML += '<span class="badge badge-premium">Premium</span>';
+            document.getElementById('profileId').textContent = user.id;
+            document.getElementById('profileRole').textContent = squad?.roles.admin?.includes(name) ? 'Administrateur' : 'Membre';
+            document.getElementById('profileSquad').textContent = squad?.name || 'Aucun';
+            document.getElementById('profileMessages').textContent = Math.floor(Math.random() * 500);
+            updateFriendButton();
+            updateBlockButton();
+            document.getElementById('memberProfileModal').classList.remove('hidden');
+        }
+
+        function updateFriendButton() {
+            const btn = document.getElementById('toggleFriendBtn');
+            if (friends.includes(currentProfileMember)) {
+                btn.textContent = 'Retirer des amis';
+                btn.className = 'mt-2 bg-zinc-600 hover:bg-zinc-500 px-3 py-1 rounded text-xs';
+            } else {
+                btn.textContent = 'Ajouter aux amis';
+                btn.className = 'mt-2 bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs';
+            }
+        }
+
+        function updateBlockButton() {
+            const btn = document.getElementById('blockUserBtn');
+            if (blockedUsers.includes(currentProfileMember)) {
+                btn.textContent = 'Débloquer';
+                btn.className = 'mt-2 bg-zinc-600 hover:bg-zinc-500 px-3 py-1 rounded text-xs ml-2';
+            } else {
+                btn.textContent = 'Bloquer';
+                btn.className = 'mt-2 bg-red-800 hover:bg-red-900 px-3 py-1 rounded text-xs ml-2';
+            }
+        }
+
+        function toggleFriend() {
+            if (friends.includes(currentProfileMember)) {
+                friends = friends.filter(f => f !== currentProfileMember);
+            } else {
+                friends.push(currentProfileMember);
+                addNotification(`${currentProfileMember} a été ajouté à vos amis.`);
+            }
+            updateFriendButton();
+            renderFriendsList();
+        }
+
+        function toggleBlock() {
+            if (blockedUsers.includes(currentProfileMember)) {
+                blockedUsers = blockedUsers.filter(b => b !== currentProfileMember);
+            } else {
+                blockedUsers.push(currentProfileMember);
+                addNotification(`${currentProfileMember} a été bloqué.`);
+            }
+            updateBlockButton();
+        }
+
+        function startPrivateChat() {
+            addNotification(`Chat privé avec ${currentProfileMember} ouvert (simulation).`);
+            alert(`Ouverture du chat privé avec ${currentProfileMember} (simulation)`);
+        }
+
+        function addNotification(text) {
+            notifications.push({ id: Date.now(), text, read: false });
+            updateNotificationUI();
+        }
+
+        function updateNotificationUI() {
+            const unread = notifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notificationCount');
+            if (unread > 0) {
+                badge.textContent = unread;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            const panel = document.getElementById('notificationsList');
+            if (panel) {
+                panel.innerHTML = notifications.map(n => `<div class="text-sm p-2 bg-zinc-800 rounded">${n.text}</div>`).join('');
+            }
+        }
+
+        function toggleNotificationsPanel() {
+            const panel = document.getElementById('notificationsPanel');
+            panel.classList.toggle('hidden');
+            notifications.forEach(n => n.read = true);
+            updateNotificationUI();
+        }
+
+        function toggleFriendsPanel() {
+            const panel = document.getElementById('friendsPanel');
+            panel.classList.toggle('hidden');
+            renderFriendsList();
+        }
+
+        function renderFriendsList() {
+            const list = document.getElementById('friendsList');
+            if (!list) return;
+            list.innerHTML = friends.map(f => {
+                const user = demoUsers.find(u => u.name === f) || { name: f, avatar: `https://picsum.photos/seed/${f}/30/30`, status: 'invisible' };
+                return `<div class="friend-item"><img src="${user.avatar}" class="w-8 h-8 rounded-full"><span>${f}</span></div>`;
+            }).join('');
+            if (friends.length === 0) list.innerHTML = '<p class="text-zinc-500">Aucun ami.</p>';
+        }
+
+        function saveData() {
+            const state = { squads, messagesCache, currentReactionCounts, friends, blockedUsers };
+            localStorage.setItem('shadowhub_squads', JSON.stringify(state));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('shadowhub_squads');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    squads = parsed.squads || squads;
+                    messagesCache = parsed.messagesCache || messagesCache;
+                    currentReactionCounts = parsed.currentReactionCounts || {};
+                    friends = parsed.friends || [];
+                    blockedUsers = parsed.blockedUsers || [];
+                    renderAll();
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        // Actions modales
+        function openCreateSquadModal() { document.getElementById('createSquadModal').classList.remove('hidden'); }
+        function openJoinSquadModal() { document.getElementById('joinSquadModal').classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function createSquad() {
+            const name = document.getElementById('newSquadName').value.trim();
+            const type = document.getElementById('newSquadType').value;
+            if (!name) return;
+            const id = 'squad_' + Date.now();
+            const newSquad = {
+                id, name, type,
+                channels: [{ id: id + '_general', name: 'général', type: 'text', section: 'default' }],
+                sections: { default: 'Général' },
+                members: [currentUser.name],
+                roles: { admin: [currentUser.name] },
+                inviteCode: 'SH-' + Math.random().toString(36).substr(2, 6).toUpperCase()
+            };
+            squads.push(newSquad);
+            generateBulkMessages(id + '_general', 20);
+            closeModal('createSquadModal');
+            selectSquad(id);
+            addNotification(`Squad "${name}" créé.`);
+            saveData();
+        }
+
+        function joinSquad() {
+            const code = document.getElementById('inviteCode').value.trim();
+            const squad = squads.find(s => s.inviteCode === code);
+            if (squad) {
+                if (!squad.members.includes(currentUser.name)) {
+                    squad.members.push(currentUser.name);
+                }
+                closeModal('joinSquadModal');
+                selectSquad(squad.id);
+                addNotification(`Vous avez rejoint "${squad.name}".`);
+                saveData();
+            } else {
+                alert('Code invalide.');
+            }
+        }
+
+        function openDiscoverSquadsModal() {
+            const list = document.getElementById('discoverSquadsList');
+            list.innerHTML = squads.filter(s => s.type === 'public').map(s => `
+                <div class="flex justify-between items-center p-2 bg-zinc-800 rounded">
+                    <span>${s.name} (${s.members.length} membres)</span>
+                    <button onclick="joinPublicSquad('${s.id}')" class="bg-red-600 px-3 py-1 rounded text-xs">Rejoindre</button>
+                </div>`).join('');
+            document.getElementById('discoverSquadsModal').classList.remove('hidden');
+        }
+
+        function joinPublicSquad(squadId) {
+            const squad = squads.find(s => s.id === squadId);
+            if (squad && !squad.members.includes(currentUser.name)) {
+                squad.members.push(currentUser.name);
+                selectSquad(squadId);
+                closeModal('discoverSquadsModal');
+                addNotification(`Vous avez rejoint "${squad.name}".`);
+                saveData();
+            }
+        }
+
+        function openSquadSettings(squadId) {
+            const squad = squads.find(s => s.id === squadId);
+            if (!squad) return;
+            document.getElementById('squadSettingsContent').innerHTML = `
+                <p>Nom: ${squad.name}</p><p>Type: ${squad.type}</p><p>Code: ${squad.inviteCode}</p>
+                <button onclick="copyInviteCode('${squad.inviteCode}')" class="text-red-400">Copier</button>`;
+            document.getElementById('squadSettingsModal').classList.remove('hidden');
+        }
+
+        function copyInviteCode(code) { navigator.clipboard.writeText(code); alert('Code copié !'); }
+
+        function deleteSquad() {
+            if (confirm('Supprimer ce squad définitivement ?')) {
+                squads = squads.filter(s => s.id !== activeSquadId);
+                activeSquadId = squads[0]?.id || null;
+                activeChannelId = squads[0]?.channels[0]?.id || null;
+                renderAll();
+                closeModal('squadSettingsModal');
+                addNotification('Squad supprimé.');
+                saveData();
+            }
+        }
+
+        function openCreateChannelModal() { document.getElementById('createChannelModal').classList.remove('hidden'); }
+
+        function createChannel() {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            const name = document.getElementById('newChannelName').value.trim();
+            const type = document.getElementById('newChannelType').value;
+            if (!name) return;
+            const section = prompt('Section (ID, laissez vide pour défaut) :') || 'default';
+            const newId = squad.id + '_' + name.replace(/\s/g, '-') + '_' + Date.now();
+            squad.channels.push({ id: newId, name, type, section });
+            if (!squad.sections[section]) squad.sections[section] = section;
+            renderChannelList();
+            closeModal('createChannelModal');
+            addNotification(`Salon "${name}" créé.`);
+            saveData();
+        }
+
+        function openCreateSectionModal() { document.getElementById('createSectionModal').classList.remove('hidden'); }
+
+        function createSection() {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            const name = document.getElementById('newSectionName').value.trim();
+            if (!name) return;
+            const sectionId = name.toLowerCase().replace(/\s+/g, '-');
+            squad.sections[sectionId] = name;
+            document.getElementById('newSectionName').value = '';
+            closeModal('createSectionModal');
+            renderChannelList();
+            addNotification(`Section "${name}" créée.`);
+            saveData();
+        }
+
+        function deleteSection(secId) {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            if (confirm('Supprimer cette section ? Les salons seront déplacés.')) {
+                squad.channels.forEach(ch => { if (ch.section === secId) ch.section = 'default'; });
+                if (!squad.sections['default']) squad.sections['default'] = 'Général';
+                delete squad.sections[secId];
+                renderChannelList();
+                saveData();
+            }
+        }
+
+        function toggleSection(id) { /* Replier/déplier pourra être ajouté */ }
+
+        function openUserSettings() {
+            document.getElementById('settingsUsername').value = currentUser.name;
+            document.getElementById('settingsAvatar').value = currentUser.avatar;
+            document.getElementById('settingsStatus').value = currentUser.status;
+            document.getElementById('userSettingsModal').classList.remove('hidden');
+        }
+
+        function saveUserSettings() {
+            currentUser.name = document.getElementById('settingsUsername').value.trim() || currentUser.name;
+            currentUser.avatar = document.getElementById('settingsAvatar').value.trim() || currentUser.avatar;
+            currentUser.status = document.getElementById('settingsStatus').value;
+            document.getElementById('currentUsername').textContent = currentUser.name;
+            document.getElementById('currentUserDisplay').textContent = currentUser.name;
+            const statusMap = { online: 'En ligne', idle: 'Occupé', dnd: 'Ne pas déranger', invisible: 'Invisible' };
+            document.getElementById('currentStatus').textContent = statusMap[currentUser.status];
+            const dotColor = { online: '#34d399', idle: '#fbbf24', dnd: '#ef4444', invisible: '#6b7280' };
+            document.getElementById('userStatusDot').style.background = dotColor[currentUser.status];
+            closeModal('userSettingsModal');
+            renderMembers();
+            addNotification('Profil mis à jour.');
+            saveData();
+        }
+
+        function handleMessageKey(e) { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            if (!content || !activeChannelId) return;
+            const channel = getCurrentChannel();
+            if (channel?.type === 'voice') { alert('Ce salon est vocal.'); return; }
+            const msg = {
+                user: { name: currentUser.name, color: 'text-blue-400', avatar: currentUser.avatar },
+                content, timestamp: new Date().toISOString(), id: Date.now()
+            };
+            if (!messagesCache[activeChannelId]) messagesCache[activeChannelId] = [];
+            messagesCache[activeChannelId].push(msg);
+            renderMessages();
+            input.value = '';
+            saveData();
+        }
+
+        function toggleMemberList() { document.getElementById('memberSidebar').classList.toggle('hidden'); }
+        function togglePinned() { addNotification('Message épinglé (simulation).'); }
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else if (document.exitFullscreen) document.exitFullscreen();
+        }
+
+        function filterMessages() {
+            const query = document.getElementById('searchMessages').value.toLowerCase();
+            document.querySelectorAll('.message').forEach(div => {
+                div.style.display = div.textContent.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function showMessageDetail(content) {
+            document.getElementById('messageDetailContent').textContent = content;
+            document.getElementById('messageDetailModal').classList.remove('hidden');
+        }
+
+        function reportMessage() {
+            addNotification('Message signalé à la modération.');
+            closeModal('messageDetailModal');
+        }
+
+        function addRole() {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            const name = prompt('Nom du rôle :');
+            if (name && !squad.roles[name]) { squad.roles[name] = []; renderRoles(); saveData(); }
+        }
+
+        function renderRoles() {
+            const squad = getCurrentSquad();
+            if (!squad) return;
+            document.getElementById('rolesList').innerHTML = Object.keys(squad.roles).map(r =>
+                `<div class="flex justify-between p-2 bg-zinc-800 rounded"><span>${r} (${squad.roles[r].length})</span><button onclick="deleteRole('${r}')" class="text-red-400">Suppr.</button></div>`
+            ).join('');
+            document.getElementById('rolesModal').classList.remove('hidden');
+        }
+
+        function deleteRole(role) {
+            const squad = getCurrentSquad();
+            if (squad?.roles[role]) { delete squad.roles[role]; renderRoles(); saveData(); }
+        }
+
+        function startVoiceCall() {
+            if (voiceCallActive) return;
+            voiceCallActive = true;
+            document.getElementById('voiceCallBar').classList.remove('hidden');
+            const participantsDiv = document.getElementById('voiceParticipants');
+            participantsDiv.innerHTML = demoUsers.slice(0, 3).map(u => `
+                <span class="voice-user" id="voice-${u.name}">
+                    <img src="${u.avatar}" class="w-6 h-6 rounded-full"> ${u.name}
+                </span>`).join('');
+            document.getElementById('voiceParticipantCount').textContent = '3';
+            if (voiceInterval) clearInterval(voiceInterval);
+            voiceInterval = setInterval(() => {
+                const users = document.querySelectorAll('.voice-user');
+                users.forEach(u => u.classList.remove('speaking'));
+                const randomUser = users[Math.floor(Math.random() * users.length)];
+                if (randomUser) randomUser.classList.add('speaking');
+            }, 2000);
+        }
+
+        function leaveVoiceCall() {
+            voiceCallActive = false;
+            document.getElementById('voiceCallBar').classList.add('hidden');
+            if (voiceInterval) clearInterval(voiceInterval);
+        }
+
+        function toggleMute() { addNotification('Microphone coupé (simulation).'); }
+        function toggleDeafen() { addNotification('Son coupé (simulation).'); }
+        function logout() { alert('Déconnexion simulée.'); }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

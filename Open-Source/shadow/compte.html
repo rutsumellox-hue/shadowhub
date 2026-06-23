@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShadowHub // Mon Compte</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="data/css/style.css"/>
+</head>
+<body class="bg-[#070709] text-zinc-200 text-sm min-h-screen flex flex-col scanlines">
+
+<div class="top-bar">
+  <span class="live flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>SHADOW LIVE</span>
+  <span class="ml-auto mono text-zinc-600" id="topUser"></span>
+  <a href="../cyberhub.html" onclick="localStorage.removeItem('cyberhub_user');localStorage.removeItem('shadow_authenticated')" class="text-red-500 hover:underline ml-4">Déconnexion</a>
+</div>
+
+<div style="padding-top:32px" class="flex flex-1">
+  <!-- SIDEBAR -->
+  <aside class="hidden lg:block w-52 bg-[#08080a] border-r border-[#150505] py-5 px-2.5">
+    <div class="flex items-center gap-2 px-3 mb-5">
+      <i class="fa-solid fa-skull-crossbones text-lg" style="color:#ff2d55;filter:drop-shadow(0 0 8px #ff2d55)"></i>
+      <span class="font-black text-sm" style="font-family:'Space Grotesk',sans-serif">SHADOW<span style="color:#ff2d55">HUB</span></span>
+    </div>
+    <a href="index.html"    class="side-link"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    <a href="forum.html"    class="side-link"><i class="fa-solid fa-comments"></i> Forum</a>
+    <a href="news.html"     class="side-link"><i class="fa-solid fa-bolt"></i> Actus</a>
+    <a href="catalogue.html"class="side-link"><i class="fa-solid fa-layer-group"></i> Catalogue</a>
+    <a href="compte.html"   class="side-link active"><i class="fa-solid fa-user"></i> Compte</a>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto w-full space-y-6">
+
+    <div class="mono text-xs text-zinc-600 mb-1">// PROFIL MEMBRE</div>
+
+    <!-- Profile card -->
+    <div class="widget p-6 flex items-center gap-6">
+      <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black flex-shrink-0"
+           style="background:linear-gradient(135deg,#6b0000,#ff2d55);font-family:'Space Grotesk',sans-serif" id="avatarLetter">?</div>
+      <div class="flex-1">
+        <h1 class="text-xl font-bold" id="profileName" style="font-family:'Space Grotesk',sans-serif"></h1>
+        <div id="profileEmail" class="mono text-xs text-zinc-500 mt-0.5"></div>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="rank rank-shadow">Shadow Membre</span>
+          <span class="badge badge-green">Actif</span>
+        </div>
+      </div>
+      <div class="text-right hidden md:block">
+        <div class="mono text-xs text-zinc-700">Membre depuis</div>
+        <div class="font-bold text-sm">Aujourd'hui</div>
+        <div class="mono text-xs text-zinc-700 mt-2">Dernière connexion</div>
+        <div class="font-bold text-sm" id="lastLogin"></div>
+      </div>
+    </div>
+
+    <!-- Stats compte -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="widget p-4 text-center">
+        <div class="stat-num text-xl">0</div>
+        <div class="mono text-xs text-zinc-600 mt-1 uppercase">Posts</div>
+      </div>
+      <div class="widget p-4 text-center">
+        <div class="stat-num text-xl">0</div>
+        <div class="mono text-xs text-zinc-600 mt-1 uppercase">Sujets créés</div>
+      </div>
+      <div class="widget p-4 text-center">
+        <div class="stat-num text-xl" style="color:#f59e0b;text-shadow:0 0 12px rgba(245,158,11,.4)">1</div>
+        <div class="mono text-xs text-zinc-600 mt-1 uppercase">Niveau</div>
+      </div>
+      <div class="widget p-4 text-center">
+        <div class="stat-num text-xl" style="color:#a78bfa;text-shadow:0 0 12px rgba(167,139,250,.3)">5</div>
+        <div class="mono text-xs text-zinc-600 mt-1 uppercase">XP</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Modifier profil -->
+      <div class="widget p-6">
+        <h2 class="font-bold mb-4" style="font-family:'Space Grotesk',sans-serif"><i class="fa-solid fa-pen-to-square mr-2 text-zinc-500"></i>Modifier le profil</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block mono text-xs text-zinc-600 uppercase mb-1.5">Pseudo</label>
+            <input id="editUsername" type="text" class="w-full bg-[#070709] border border-[#1e1e28] rounded-lg px-4 py-2.5 text-sm outline-none focus:border-red-500" placeholder="Ton pseudo"/>
+          </div>
+          <div>
+            <label class="block mono text-xs text-zinc-600 uppercase mb-1.5">Bio (optionnel)</label>
+            <textarea class="w-full bg-[#070709] border border-[#1e1e28] rounded-lg px-4 py-2.5 text-sm outline-none focus:border-red-500 resize-none" rows="3" placeholder="Quelques mots sur toi..."></textarea>
+          </div>
+          <button id="saveBtn" onclick="saveProfile()" class="danger-btn w-full text-center py-2.5 block">
+            <i class="fa-solid fa-floppy-disk mr-2"></i>Enregistrer
+          </button>
+          <div id="saveMsg" class="hidden badge badge-green text-xs py-2 px-3 text-center block">✓ Profil mis à jour</div>
+        </div>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="widget p-6">
+        <h2 class="font-bold mb-4" style="font-family:'Space Grotesk',sans-serif"><i class="fa-solid fa-shield-halved mr-2 text-zinc-500"></i>Sécurité</h2>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 rounded-lg bg-[#070709] border border-[#1e1e28]">
+            <div>
+              <div class="text-sm font-medium">Double authentification</div>
+              <div class="mono text-xs text-zinc-600">Accès Zone Shadow</div>
+            </div>
+            <span class="badge badge-green">ACTIF</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-[#070709] border border-[#1e1e28]">
+            <div>
+              <div class="text-sm font-medium">Session chiffrée</div>
+              <div class="mono text-xs text-zinc-600">TLS 1.3</div>
+            </div>
+            <span class="badge badge-green">ACTIF</span>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-[#070709] border border-[#1e1e28]">
+            <div>
+              <div class="text-sm font-medium">Logs activité</div>
+              <div class="mono text-xs text-zinc-600">Côté client uniquement</div>
+            </div>
+            <span class="badge badge-purple">LOCAL</span>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-5 border-t border-zinc-900">
+          <button onclick="if(confirm('Déconnecter tous les appareils ?')){localStorage.clear();location.href='../cyberhub.html';}"
+                  class="w-full text-xs mono text-red-700 hover:text-red-400 transition py-2">
+            <i class="fa-solid fa-right-from-bracket mr-1.5"></i>Déconnexion complète + effacer session
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation rapide -->
+    <div class="widget p-5">
+      <h2 class="font-bold mb-4" style="font-family:'Space Grotesk',sans-serif">Navigation rapide</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <a href="forum.html"    class="card-compact text-center group cursor-pointer"><i class="fa-solid fa-comments text-lg text-zinc-500 group-hover:text-red-400 transition mb-2 block"></i><div class="text-xs">Forum</div></a>
+        <a href="news.html"     class="card-compact text-center group cursor-pointer"><i class="fa-solid fa-bolt text-lg text-zinc-500 group-hover:text-amber-400 transition mb-2 block"></i><div class="text-xs">Actus</div></a>
+        <a href="catalogue.html"class="card-compact text-center group cursor-pointer"><i class="fa-solid fa-layer-group text-lg text-zinc-500 group-hover:text-purple-400 transition mb-2 block"></i><div class="text-xs">Catalogue</div></a>
+        <a href="mirrors.html"  class="card-compact text-center group cursor-pointer"><i class="fa-solid fa-link text-lg text-zinc-500 group-hover:text-green-400 transition mb-2 block"></i><div class="text-xs">Mirrors</div></a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  if(!localStorage.getItem('shadow_authenticated')) window.location.href='../shadow-gate.html';
+  const user  = localStorage.getItem('cyberhub_username') || (localStorage.getItem('cyberhub_user')||'Anonyme').split('@')[0];
+  const email = localStorage.getItem('cyberhub_user') || '';
+  document.getElementById('topUser').textContent = user;
+  document.getElementById('profileName').textContent = user;
+  document.getElementById('profileEmail').textContent = email;
+  document.getElementById('avatarLetter').textContent = user.charAt(0).toUpperCase();
+  document.getElementById('editUsername').value = user;
+  document.getElementById('lastLogin').textContent = new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+
+  function saveProfile(){
+    const newName = document.getElementById('editUsername').value.trim();
+    if(!newName) return;
+    localStorage.setItem('cyberhub_username', newName);
+    document.getElementById('profileName').textContent = newName;
+    document.getElementById('avatarLetter').textContent = newName.charAt(0).toUpperCase();
+    document.getElementById('topUser').textContent = newName;
+    const msg = document.getElementById('saveMsg');
+    msg.classList.remove('hidden');
+    setTimeout(()=>msg.classList.add('hidden'), 3000);
+  }
+</script>
+</body>
+</html>

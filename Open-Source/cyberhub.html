@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberHub // Communauté Tech & Sécurité</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;700;800&display=swap');
+
+    :root {
+      --red: #ff2d55;
+      --green: #00ff88;
+      --purple: #7c3aed;
+      --bg: #070709;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #e4e4e7;
+      overflow-x: hidden;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Ticker */
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+      background: #0a0002;
+      border-bottom: 1px solid #2a0a0a;
+    }
+
+    .ticker {
+      display: inline-block;
+      animation: tick 35s linear infinite;
+    }
+
+    @keyframes tick {
+      from {
+        transform: translateX(0)
+      }
+
+      to {
+        transform: translateX(-50%)
+      }
+    }
+
+    /* Nav */
+    nav.main {
+      background: rgba(4, 4, 6, .97);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid #1a0a0a;
+    }
+
+    /* Hero */
+    .hero-bg {
+      background: radial-gradient(ellipse at 50% -10%, rgba(255, 45, 85, .18) 0%, var(--bg) 65%);
+    }
+
+    .glitch {
+      position: relative;
+      display: inline-block;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-txt);
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .glitch::before {
+      color: var(--red);
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+      animation: g1 3.5s infinite linear;
+    }
+
+    .glitch::after {
+      color: #00cfff;
+      clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+      animation: g2 3.5s infinite linear;
+      animation-delay: .05s;
+    }
+
+    @keyframes g1 {
+
+      0%,
+      90% {
+        transform: none;
+        opacity: 0
+      }
+
+      91% {
+        transform: translate(-2px, 0);
+        opacity: .6
+      }
+
+      92% {
+        transform: none;
+        opacity: 0
+      }
+    }
+
+    @keyframes g2 {
+
+      0%,
+      90% {
+        transform: none;
+        opacity: 0
+      }
+
+      91.5% {
+        transform: translate(2px, 0);
+        opacity: .5
+      }
+
+      92.5% {
+        transform: none;
+        opacity: 0
+      }
+    }
+
+    /* Cards */
+    .article-card {
+      background: #0d0d11;
+      border: 1px solid #1e1e28;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all .3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .article-card:hover {
+      border-color: var(--red);
+      transform: translateY(-6px);
+      box-shadow: 0 0 28px -6px rgba(255, 45, 85, .4), 0 20px 40px -10px rgba(0, 0, 0, .8);
+    }
+
+    .article-card img {
+      transition: transform .4s;
+    }
+
+    .article-card:hover img {
+      transform: scale(1.04);
+    }
+
+    /* Stats */
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--red);
+      text-shadow: 0 0 18px rgba(255, 45, 85, .5);
+    }
+
+    /* Section tags */
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
+
+    .tag-red {
+      background: rgba(255, 45, 85, .15);
+      color: var(--red);
+      border: 1px solid rgba(255, 45, 85, .3);
+    }
+
+    .tag-green {
+      background: rgba(0, 255, 136, .1);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 136, .25);
+    }
+
+    .tag-purple {
+      background: rgba(124, 58, 237, .15);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, .3);
+    }
+
+    .tag-amber {
+      background: rgba(245, 158, 11, .15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, .3);
+    }
+
+    /* Shadow link */
+    .shadow-link {
+      opacity: .25;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .65rem;
+      letter-spacing: .15em;
+      transition: all .4s;
+    }
+
+    .shadow-link:hover {
+      opacity: 1;
+      color: var(--red);
+    }
+
+    /* CTA btn */
+    .btn-red {
+      background: linear-gradient(135deg, #be0000, var(--red));
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 14px 32px;
+      border: none;
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: 0 0 20px rgba(255, 45, 85, .3);
+    }
+
+    .btn-red:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 36px rgba(255, 45, 85, .6);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #e4e4e7;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 14px 28px;
+      border: 1px solid #3f3f46;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3f3f46;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap py-1.5">
+    <div class="ticker text-xs text-red-500 mono px-4">
+      <span class="text-zinc-600 mr-6">●</span>
+      CYBERHUB NEWS &nbsp;|&nbsp; Reverse engineering : guide avancé disponible &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Nouveau tuto : SQL injection zero-to-hero &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Zone Shadow : accès restreint aux membres vérifiés &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Forum actif >>| 1248 membres en ligne &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Mise à jour mirrors >>| 23 nouveaux liens actifs &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; CYBERHUB NEWS &nbsp;|&nbsp; Reverse engineering : guide avancé
+      disponible &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Nouveau tuto : SQL injection zero-to-hero &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Zone Shadow : accès restreint aux membres vérifiés &nbsp;|&nbsp;
+      <span class="text-zinc-600">▸</span>&nbsp; Forum actif >>| 1248 membres en ligne &nbsp;|&nbsp;
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="main sticky top-0 z-50 py-4 px-6 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <i class="fa-solid fa-microchip text-2xl" style="color:var(--red);filter:drop-shadow(0 0 8px var(--red))"></i>
+      <span class="text-xl font-bold tracking-tight" style="font-family:'Space Grotesk',sans-serif">Cyber<span
+          style="color:var(--red)">Hub</span></span>
+      <span class="mono text-xs text-zinc-600 ml-2">v3.0</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 text-sm">
+      <a href="#articles"
+        class="text-zinc-400 hover:text-white transition mono text-xs uppercase tracking-widest">Articles</a>
+      <a href="#community"
+        class="text-zinc-400 hover:text-white transition mono text-xs uppercase tracking-widest">Stats</a>
+      <a href="#tools"
+        class="text-zinc-400 hover:text-white transition mono text-xs uppercase tracking-widest">Outils</a>
+      <a href="login.html"
+        class="text-zinc-400 hover:text-white transition mono text-xs uppercase tracking-widest">Connexion</a>
+      <a href="signup.html" class="btn-red text-sm py-2.5 px-5">Rejoindre</a>
+    </div>
+    <!-- Mobile nav -->
+    <div class="md:hidden flex gap-3">
+      <a href="login.html" class="text-zinc-400 text-sm">Connexion</a>
+      <a href="signup.html" class="btn-red text-sm py-2 px-4">S'inscrire</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero-bg py-28 text-center relative overflow-hidden px-4">
+    <div class="mono text-xs text-zinc-600 uppercase tracking-widest mb-6 flex justify-center gap-4 items-center">
+      <span class="w-2 h-2 rounded-full animate-pulse"
+        style="background:var(--green);box-shadow:0 0 8px var(--green)"></span>
+      SYSTÈME EN LIGNE >>| 1248 CONNECTÉS
+    </div>
+
+    <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none"
+      style="font-family:'Space Grotesk',sans-serif">
+      <span class="glitch" data-txt="CYBERHUB">CYBERHUB</span>
+    </h1>
+    <p class="text-xl text-zinc-400 max-w-2xl mx-auto mb-3">Le carrefour underground de la tech, de la sécu, du reverse.
+    </p>
+    <p class="mono text-sm text-zinc-600 mb-10">Articles · Tutoriels · Communauté privée · Zone Shadow</p>
+
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="signup.html" class="btn-red text-base">Créer un compte</a>
+      <a href="#articles" class="btn-outline text-base">Explorer le contenu</a>
+    </div>
+
+    <!-- Ligne de stats sous hero -->
+    <div class="mt-16 flex flex-wrap justify-center gap-8 md:gap-16 mono text-xs text-zinc-500">
+      <div><span class="text-white font-bold text-lg" id="h1">0</span> membres</div>
+      <div><span class="text-white font-bold text-lg" id="h2">0</span> sujets forum</div>
+      <div><span class="text-white font-bold text-lg" id="h3">0</span> messages</div>
+      <div><span class="text-white font-bold text-lg" id="h4">0</span> ressources</div>
+    </div>
+  </header>
+
+  <!-- ARTICLES -->
+  <section id="articles" class="max-w-7xl mx-auto px-6 py-20">
+    <div class="flex items-baseline justify-between mb-10">
+      <div>
+        <div class="mono text-xs text-zinc-600 uppercase tracking-widest mb-2">// Dernières publications</div>
+        <h2 class="text-3xl font-bold" style="font-family:'Space Grotesk',sans-serif">Articles & Tutoriels</h2>
+      </div>
+      <a href="login.html" class="tag tag-red mono text-xs py-2 px-4">Voir tout →</a>
+    </div>
+
+    <!-- Grid articles -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+      <!-- Article 1 — Featured -->
+      <div class="article-card md:col-span-2 flex flex-col md:flex-row cursor-pointer"
+        onclick="location.href='login.html'">
+        <div class="overflow-hidden md:w-72 flex-shrink-0">
+          <img src="https://picsum.photos/seed/cyber-re/720/400" class="w-full h-52 md:h-full object-cover">
+        </div>
+        <div class="p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex gap-2 mb-3"><span class="tag tag-red">Sécurité</span><span
+                class="tag tag-amber">Avancé</span></div>
+            <h3 class="text-xl font-bold mb-3 leading-tight" style="font-family:'Space Grotesk',sans-serif">Reverse
+              Engineering 101. Désassembler un binaire avec Ghidra</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed line-clamp-3">Guide complet : installer Ghidra, importer un
+              exécutable Windows, identifier les fonctions critiques et reconstruire la logique d'un programme obfusqué.
+              Niveau intermédiaire.</p>
+          </div>
+          <div class="flex items-center justify-between mt-4 mono text-xs text-zinc-500">
+            <span>Par <span class="text-zinc-300">0xVoid</span> · 18 Juin 2026</span>
+            <div class="flex gap-4">
+              <span><i class="fa-regular fa-eye mr-1"></i>4.2k</span>
+              <span><i class="fa-regular fa-heart mr-1"></i>312</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article 2 -->
+      <div class="article-card cursor-pointer" onclick="location.href='login.html'">
+        <div class="overflow-hidden h-44">
+          <img src="https://picsum.photos/seed/sqli/600/300" class="w-full h-full object-cover">
+        </div>
+        <div class="p-5">
+          <div class="flex gap-2 mb-2"><span class="tag tag-purple">Web</span><span class="tag tag-red">Pentest</span>
+          </div>
+          <h3 class="font-bold text-base mb-2 line-clamp-2" style="font-family:'Space Grotesk',sans-serif">SQL Injection
+            : de zéro à l'exfiltration de base de données</h3>
+          <p class="text-zinc-400 text-xs line-clamp-2">Blind SQLi, time-based, union-based. toutes les techniques en un
+            guide.</p>
+          <div class="mono text-xs text-zinc-600 mt-3">11 Juin · 2.8k vues</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Article 3 -->
+      <div class="article-card cursor-pointer" onclick="location.href='login.html'">
+        <div class="overflow-hidden h-40">
+          <img src="https://picsum.photos/seed/vpn-anon/600/300" class="w-full h-full object-cover">
+        </div>
+        <div class="p-5">
+          <div class="flex gap-2 mb-2"><span class="tag tag-green">Anonymat</span></div>
+          <h3 class="font-bold text-base mb-2 line-clamp-2" style="font-family:'Space Grotesk',sans-serif">Stack Tor +
+            VPN + Tails : le guide d'anonymisation complet</h3>
+          <div class="mono text-xs text-zinc-600 mt-2">8 Juin · 3.1k vues</div>
+        </div>
+      </div>
+
+      <!-- Article 4 -->
+      <div class="article-card cursor-pointer" onclick="location.href='login.html'">
+        <div class="overflow-hidden h-40">
+          <img src="https://picsum.photos/seed/wifi-hack/600/300" class="w-full h-full object-cover">
+        </div>
+        <div class="p-5">
+          <div class="flex gap-2 mb-2"><span class="tag tag-amber">Wi-Fi</span><span class="tag tag-red">Sécurité</span>
+          </div>
+          <h3 class="font-bold text-base mb-2 line-clamp-2" style="font-family:'Space Grotesk',sans-serif">Auditer son
+            réseau Wi-Fi avec aircrack-ng en 2026</h3>
+          <div class="mono text-xs text-zinc-600 mt-2">5 Juin · 1.9k vues</div>
+        </div>
+      </div>
+
+      <!-- Article 5 -->
+      <div class="article-card cursor-pointer" onclick="location.href='login.html'">
+        <div class="overflow-hidden h-40">
+          <img src="https://picsum.photos/seed/malware-analysis/600/300" class="w-full h-full object-cover">
+        </div>
+        <div class="p-5">
+          <div class="flex gap-2 mb-2"><span class="tag tag-purple">Malware</span></div>
+          <h3 class="font-bold text-base mb-2 line-clamp-2" style="font-family:'Space Grotesk',sans-serif">Analyser un
+            malware inconnu dans une sandbox isolée</h3>
+          <div class="mono text-xs text-zinc-600 mt-2">2 Juin · 2.3k vues</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tools" class="bg-black/40 border-t border-b border-zinc-900 py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="mono text-xs text-zinc-600 uppercase tracking-widest mb-2">// Ressources membres</div>
+      <h2 class="text-2xl font-bold mb-10" style="font-family:'Space Grotesk',sans-serif">Outils & Ressources</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="login.html"
+          class="flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-red-800 hover:bg-zinc-900 transition-all cursor-pointer group">
+          <i class="fa-solid fa-terminal text-2xl text-zinc-400 group-hover:text-red-400 transition"></i>
+          <div class="font-semibold text-sm">Scripts & Outils</div>
+          <div class="mono text-xs text-zinc-600">142 fichiers</div>
+        </a>
+        <a href="login.html"
+          class="flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-purple-800 hover:bg-zinc-900 transition-all cursor-pointer group">
+          <i class="fa-solid fa-book text-2xl text-zinc-400 group-hover:text-purple-400 transition"></i>
+          <div class="font-semibold text-sm">Guides PDF</div>
+          <div class="mono text-xs text-zinc-600">67 documents</div>
+        </a>
+        <a href="login.html"
+          class="flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-amber-800 hover:bg-zinc-900 transition-all cursor-pointer group">
+          <i class="fa-solid fa-video text-2xl text-zinc-400 group-hover:text-amber-400 transition"></i>
+          <div class="font-semibold text-sm">Vidéos Exclusives</div>
+          <div class="mono text-xs text-zinc-600">28 vidéos</div>
+        </a>
+        <a href="login.html"
+          class="flex flex-col gap-3 p-5 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-green-800 hover:bg-zinc-900 transition-all cursor-pointer group">
+          <i class="fa-solid fa-code text-2xl text-zinc-400 group-hover:text-green-400 transition"></i>
+          <div class="font-semibold text-sm">Lab Virtuel</div>
+          <div class="mono text-xs text-zinc-600">Accès membres</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY STATS -->
+  <section id="community" class="max-w-7xl mx-auto px-6 py-20">
+    <div class="mono text-xs text-zinc-600 uppercase tracking-widest mb-2">// Activité communauté</div>
+    <h2 class="text-2xl font-bold mb-10" style="font-family:'Space Grotesk',sans-serif">Une communauté active</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-14">
+      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 text-center">
+        <div class="stat-val" id="s1">12,458</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Membres</div>
+      </div>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 text-center">
+        <div class="stat-val" id="s2">3,210</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Sujets</div>
+      </div>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 text-center">
+        <div class="stat-val" id="s3">18,942</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Messages</div>
+      </div>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 text-center">
+        <div class="stat-val" id="s4">847</div>
+        <div class="mono text-xs text-zinc-600 uppercase mt-1">Ressources</div>
+      </div>
+    </div>
+
+    <!-- CTA final -->
+    <div class="bg-gradient-to-r from-zinc-950 to-black border border-zinc-800 rounded-2xl p-10 text-center">
+      <h3 class="text-2xl font-bold mb-3" style="font-family:'Space Grotesk',sans-serif">Rejoins la communauté</h3>
+      <p class="text-zinc-400 mb-6 max-w-md mx-auto text-sm">Accès immédiat aux articles, au forum et aux ressources
+        membres. Gratuit.</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="signup.html" class="btn-red">Créer un compte gratuit</a>
+        <a href="login.html" class="btn-outline">J'ai déjà un compte</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-zinc-900 py-12 text-center">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-center gap-2 mb-4">
+        <i class="fa-solid fa-microchip" style="color:var(--red)"></i>
+        <span class="font-bold mono text-sm">CYBERHUB</span>
+      </div>
+      <p class="text-xs text-zinc-600 mb-6">© 2026 CyberHub >_ Communauté Tech & Sécurité</p>
+      <div class="flex justify-center gap-6 text-xs text-zinc-700 mb-6">
+        <a href="login.html" class="hover:text-zinc-400 transition">Connexion</a>
+        <a href="signup.html" class="hover:text-zinc-400 transition">Inscription</a>
+        <a href="login.html" class="hover:text-zinc-400 transition">Articles</a>
+      </div>
+      <p><a href="shadow-gate.html" class="shadow-link">● ACCÈS RESTREINT SHADOW ●</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Redirect si déjà connecté
+    if (localStorage.getItem('cyberhub_user')) {
+      document.querySelector('a[href="login.html"]:not(.shadow-link)') &&
+        (document.querySelector('a[href="login.html"]').textContent = 'Dashboard') &&
+        (document.querySelector('a[href="login.html"]').href = 'dashboard.html');
+    }
+
+    // Counters animés
+    function animCount(el, target, suffix = '') {
+      let start = 0, duration = 1800, step = 16;
+      const inc = target / (duration / step);
+      const timer = setInterval(() => {
+        start += inc;
+        if (start >= target) { start = target; clearInterval(timer); }
+        el.textContent = Math.floor(start).toLocaleString('fr-FR') + suffix;
+      }, step);
+    }
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animCount(document.getElementById('s1'), 12458);
+          animCount(document.getElementById('s2'), 3210);
+          animCount(document.getElementById('s3'), 18942);
+          animCount(document.getElementById('s4'), 847);
+          obs.disconnect();
+        }
+      });
+    }, { threshold: .3 });
+    obs.observe(document.getElementById('community'));
+
+    // Hero mini counters
+    animCount(document.getElementById('h1'), 12458);
+    animCount(document.getElementById('h2'), 3210);
+    animCount(document.getElementById('h3'), 18942);
+    animCount(document.getElementById('h4'), 847);
+  </script>
+</body>
+
+</html>

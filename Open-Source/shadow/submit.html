@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SUBMIT // SHADOWHUB (TERMINAL)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="data/css/style.css" />
+    <!-- Inline styles removed; uses central stylesheet for utilities like .scanlines, .flicker, .danger-btn -->
+</head>
+<body class="text-zinc-200 scanlines">
+
+    <div class="fixed top-0 left-0 right-0 z-50 bg-black/90 border-b border-red-900 px-6 py-2 text-xs uppercase tracking-widest flex items-center gap-4">
+        <span class="text-red-500 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>SUBMIT TERMINAL</span>
+        <span class="text-zinc-400">Soumettre un paquet — démonstration visuelle. Actions réelles désactivées.</span>
+        <span class="ml-auto text-zinc-500">SESSION: DEMO-SUBMIT</span>
+    </div>
+
+    <header class="bg-black/80 border-b border-zinc-900 sticky top-9 z-40">
+        <div class="max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-terminal text-2xl text-red-400"></i>
+                <div>
+                    <div class="text-lg font-bold flicker">SUBMIT — TERMINAL</div>
+                    <div class="text-xs text-zinc-500">Remplissez le formulaire, la vérification est simulée.</div>
+                </div>
+            </div>
+            <nav class="text-xs uppercase text-zinc-300 flex gap-4">
+                <a href="index.html">Index</a>
+                <a href="catalogue.html">Catalogue</a>
+                <a href="warez.html">Warez</a>
+                <a href="forum.html">Forum</a>
+                <a href="mirrors.html">Mirrors</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-[1200px] mx-auto px-6 py-8">
+        <div class="grid grid-cols-12 gap-6">
+            <section class="col-span-8">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
+                    <h2 class="text-2xl font-extrabold text-red-400 upper-raw mb-2">Soumettre un paquet</h2>
+                    <p class="text-zinc-400 text-sm mb-4">Les liens et fichiers sont masqués dans cette démonstration.</p>
+
+                    <form id="submitForm" class="space-y-6">
+                        <div>
+                            <label class="text-xs uppercase text-zinc-400">Nom du package</label>
+                            <input id="name" type="text" required class="w-full bg-black border border-zinc-800 rounded px-4 py-3 mt-2 outline-none" placeholder="ex: Windows 11 Activator HWID" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs uppercase text-zinc-400">Version / Build</label>
+                                <input id="version" type="text" class="w-full bg-black border border-zinc-800 rounded px-4 py-3 mt-2 outline-none" placeholder="ex: 2026.06" />
+                            </div>
+                            <div>
+                                <label class="text-xs uppercase text-zinc-400">Type / Catégorie</label>
+                                <select id="category" class="w-full bg-black border border-zinc-800 rounded px-4 py-3 mt-2 outline-none">
+                                    <option value="cracks">Cracks</option>
+                                    <option value="android">Android</option>
+                                    <option value="games">Jeux</option>
+                                    <option value="productivity">Productivité</option>
+                                    <option value="security">Sécurité</option>
+                                    <option value="other">Autres</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs uppercase text-zinc-400">Description</label>
+                            <textarea id="description" rows="5" class="w-full bg-black border border-zinc-800 rounded px-4 py-3 mt-2 outline-none" placeholder="Fonctionnalités, OS supportés..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="text-xs uppercase text-zinc-400">Liens (un par ligne)</label>
+                            <div class="flex gap-2 mt-2">
+                                <input id="linkInput" type="text" class="flex-1 bg-black border border-zinc-800 rounded px-3 py-2" placeholder="colle un lien et clique Ajouter" />
+                                <button id="addLinkBtn" type="button" class="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded">Ajouter</button>
+                            </div>
+                            <div id="linksList" class="mt-3 text-xs text-zinc-300"></div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs uppercase text-zinc-400">Fichier (drag & drop)</label>
+                            <div id="fileDrop" class="mt-2 dropzone p-3 bg-black border border-zinc-800 rounded cursor-pointer">
+                                <input id="fileInput" type="file" class="hidden" />
+                                <div id="fileMeta" class="text-xs text-zinc-400">Aucun fichier sélectionné</div>
+                                <div class="text-xs text-zinc-500 mt-1">SHA256: <span id="sha256">—</span></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs uppercase text-zinc-400">Mot de passe archive (optionnel)</label>
+                                <input id="archivePass" type="text" class="w-full bg-black border border-zinc-800 rounded px-4 py-3 mt-2 outline-none" />
+                            </div>
+                            <div>
+                                <label class="text-xs uppercase text-zinc-400">PGP publique (optionnel)</label>
+                                <textarea id="pgp" class="w-full bg-black border border-zinc-800 rounded px-4 py-3 mt-2 outline-none" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="inline-flex items-center text-xs text-zinc-400"><input id="certify" type="checkbox" class="mr-2"> Je certifie ne pas uploader de contenu illégal.</label>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button id="submitBtn" type="button" class="danger-btn px-6 py-3 rounded font-bold">Soumettre et lancer la vérification</button>
+                            <button id="resetBtn" type="button" class="px-4 py-3 bg-zinc-800 rounded">Réinitialiser</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-6">
+                        <h3 class="text-sm font-bold text-red-400">Journal des soumissions (local)</h3>
+                        <div id="submitLog" class="bg-black border border-zinc-800 rounded p-3 font-mono text-xs text-emerald-400 h-44 overflow-y-auto mt-2"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="col-span-4 space-y-4">
+                <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm">
+                    <div class="text-red-400 uppercase text-xs mb-2">Guide rapide</div>
+                    <ul class="text-zinc-400 text-xs list-disc list-inside">
+                        <li>Fournissez une description claire et un checksum si possible.</li>
+                        <li>Les liens sont masqués et vérifiés. Les fichiers ne sont pas transmis dans cette démo.</li>
+                        <li>Toute soumission suspecte sera rejetée.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-black border border-zinc-800 rounded-2xl p-4 font-mono text-xs text-emerald-400">
+                    <div>QUEUE: <span id="queueCount">0</span></div>
+                    <div class="mt-2">Modérateurs en ligne: <span id="modsOnline">--</span></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Verification overlay will be handled by ShadowHub modal -->
+
+    <script src="js/core.js"></script>
+    <script>
+        // Helpers
+        const submitLog = document.getElementById('submitLog');
+        const queueCount = document.getElementById('queueCount');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const linkInput = document.getElementById('linkInput');
+        const addLinkBtn = document.getElementById('addLinkBtn');
+        const linksList = document.getElementById('linksList');
+        const fileDrop = document.getElementById('fileDrop');
+        const fileInput = document.getElementById('fileInput');
+        const fileMeta = document.getElementById('fileMeta');
+        const shaEl = document.getElementById('sha256');
+
+        function pushLog(msg){ const d = new Date().toISOString().replace('T',' ').slice(0,19); const el = document.createElement('div'); el.textContent = `[${d}] ${msg}`; submitLog.appendChild(el); submitLog.scrollTop = submitLog.scrollHeight; }
+
+        // File drop
+        fileDrop.addEventListener('click', ()=> fileInput.click());
+        fileInput.addEventListener('change', e=> handleFile(e.target.files[0]));
+        fileDrop.addEventListener('dragover', e=>{ e.preventDefault(); fileDrop.classList.add('border-red-700'); });
+        fileDrop.addEventListener('dragleave', e=>{ fileDrop.classList.remove('border-red-700'); });
+        fileDrop.addEventListener('drop', e=>{ e.preventDefault(); fileDrop.classList.remove('border-red-700'); const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(f) handleFile(f); });
+
+        function humanSize(bytes){ if(!bytes && bytes !== 0) return '—'; const u=['B','KB','MB','GB','TB']; let i=0; let b=bytes; while(b>1024 && i<u.length-1){ b/=1024; i++ } return Math.round(b*10)/10 + ' ' + u[i]; }
+
+        async function handleFile(file){ if(!file) return; fileMeta.textContent = `${file.name} • ${humanSize(file.size)}`; shaEl.textContent = 'calcul en cours...'; try{ const hash = await computeSHA256(file); shaEl.textContent = hash; }catch(e){ shaEl.textContent = 'erreur'; } }
+
+        async function computeSHA256(file){ const buffer = await file.arrayBuffer(); const hashBuffer = await crypto.subtle.digest('SHA-256', buffer); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+        // Links list
+        const links = [];
+        addLinkBtn.addEventListener('click', ()=>{ const v = linkInput.value.trim(); if(!v) return; links.push(v); renderLinks(); linkInput.value=''; });
+        function renderLinks(){ linksList.innerHTML = ''; links.forEach((l,idx)=>{ const d = document.createElement('div'); d.className='flex items-center justify-between bg-zinc-900 p-2 rounded gap-2'; d.innerHTML = `<div class="text-xs text-zinc-300 truncate">${l}</div><button class="text-xs px-2 py-1 bg-red-700 rounded">Suppr</button>`; linksList.appendChild(d); d.querySelector('button').addEventListener('click', ()=>{ links.splice(idx,1); renderLinks(); }); }); }
+
+        // Verification simulation using ShadowHub modal
+        async function runVerification(payload){
+            const modalHtml = `
+                <h3 class="text-red-400 font-bold">VÉRIFICATION EN COURS</h3>
+                <p class="text-zinc-300 mt-2">Analyse automatique puis revue humaine — démonstration.</p>
+                <div id="verProgress" class="mt-4 small-mono"></div>
+                <div id="verLog" class="font-mono text-xs text-emerald-300 h-36 overflow-y-auto bg-black/40 p-3 rounded mt-3"></div>
+                <div class="mt-4 text-right"><button id="verCloseBtn" class="px-3 py-2 bg-zinc-800 rounded">FERMER</button></div>
+            `;
+            ShadowHub.showModal(modalHtml);
+
+            const prog = document.getElementById('verProgress'); const verLog = document.getElementById('verLog');
+            function push(m){ const d = new Date().toISOString().replace('T',' ').slice(0,19); const el = document.createElement('div'); el.textContent = `[${d}] ${m}`; verLog.appendChild(el); verLog.scrollTop = verLog.scrollHeight; }
+
+            const steps = [
+                {name:'Checksum', min:400, max:1000},
+                {name:'Sandbox scan', min:800, max:1600},
+                {name:'Metadata check', min:300, max:700},
+                {name:'Mirror validation', min:300, max:900},
+                {name:'Moderator queue', min:600, max:1400}
+            ];
+
+            let rejected = false;
+            for(let i=0;i<steps.length;i++){
+                const s = steps[i]; prog.innerHTML += `<div>→ ${s.name} ... <span class="text-zinc-400">en cours</span></div>`; push(`${s.name} started`);
+                const wait = s.min + Math.floor(Math.random()*(s.max-s.min));
+                const increments = Math.max(1, Math.floor(wait/200));
+                for(let j=0;j<increments;j++){ await new Promise(r=>setTimeout(r, Math.floor(wait/increments))); prog.style.width = `${Math.round(((i + j/increments)/steps.length)*100)}%`; }
+                if(s.name==='Sandbox scan' && Math.random()<0.06){ push('Sandbox scan: suspicious payload detected'); rejected = true; break; }
+                push(`${s.name} OK`);
+            }
+
+            if(rejected){ push('Final: rejected by automatic checks'); const closeBtn = document.getElementById('verCloseBtn'); if(closeBtn) closeBtn.addEventListener('click', ()=> ShadowHub.closeModal()); }
+            else { const ticket = 'SHD-'+Math.random().toString(36).slice(2,9).toUpperCase(); push(`Final: queued (ticket ${ticket})`); queueCount.textContent = parseInt(queueCount.textContent||'0') + 1; const closeBtn = document.getElementById('verCloseBtn'); if(closeBtn) closeBtn.addEventListener('click', ()=> ShadowHub.closeModal()); }
+        }
+
+        // Submit
+        submitBtn.addEventListener('click', async ()=>{
+            const name = document.getElementById('name').value.trim();
+            const desc = document.getElementById('description').value.trim();
+            const certify = document.getElementById('certify').checked;
+            if(!name){ alert('Le nom du package est requis'); return; }
+            if(!desc){ alert('La description est requise'); return; }
+            if(!certify){ alert('Vous devez certifier que vous ne partagez pas de contenu illégal'); return; }
+
+            const payload = {
+                name, version: document.getElementById('version').value.trim(), category: document.getElementById('category').value,
+                description: desc, links: links.slice(), sha256: shaEl.textContent || null, ts: new Date().toISOString()
+            };
+            const stored = JSON.parse(localStorage.getItem('shadow_submissions')||'[]'); stored.unshift(payload); localStorage.setItem('shadow_submissions', JSON.stringify(stored.slice(0,50)));
+            pushLog('Soumission reçue (local) : ' + name);
+            await runVerification(payload);
+        });
+
+        resetBtn.addEventListener('click', ()=>{ document.getElementById('submitForm').reset(); links.length=0; renderLinks(); fileMeta.textContent='Aucun fichier sélectionné'; shaEl.textContent='—'; pushLog('Formulaire réinitialisé'); });
+
+        document.addEventListener('DOMContentLoaded', ()=>{ const mods = Math.floor(Math.random()*5)+1; document.getElementById('modsOnline').textContent = mods; queueCount.textContent = (JSON.parse(localStorage.getItem('shadow_submissions')||'[]').length || 0); pushLog('Terminal prêt (démo)'); });
+    </script>
+</body>
+</html>

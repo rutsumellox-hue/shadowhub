@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShadowHub // The Bazaar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../data/css/style.css" />
+    <link rel="stylesheet" href="../data/css/bazaar.css" />
+    <style>
+        :root {
+            --neon-red: #ff2d55;
+            --neon-purple: #a855f7;
+        }
+
+        .bazaar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .item-card {
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #1f1f2e;
+            background: #0a0a0f;
+        }
+
+        .item-card:hover {
+            transform: translateY(-16px) scale(1.04);
+            box-shadow: 0 0 60px -10px var(--neon-red);
+            border-color: var(--neon-red);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), 0 0 40px var(--neon-purple), 0 0 80px var(--neon-purple);
+        }
+
+        .rarity-mythic {
+            animation: mythicGlow 1.5s infinite alternate;
+        }
+
+        @keyframes mythicGlow {
+            from {
+                box-shadow: 0 0 20px #ef4444, 0 0 40px #a855f7;
+            }
+
+            to {
+                box-shadow: 0 0 40px #ef4444, 0 0 80px #a855f7, 0 0 120px #7c3aed;
+            }
+        }
+
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 45, 85, 0.03) 10px, rgba(255, 45, 85, 0.03) 20px);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .toast {
+            animation: toastIn 0.4s ease forwards, toastOut 0.4s 3.4s forwards;
+        }
+
+        @keyframes toastIn {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toastOut {
+            to {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #22c55e;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-[#070709] text-zinc-200 text-sm min-h-screen flex flex-col scanlines">
+
+    <div class="top-bar">
+        <span class="live flex items-center gap-1.5"><span class="live-dot"></span>BAZAAR LIVE — 142 TRADES
+            ACTIFS</span>
+        <span id="onlineBadge" class="text-zinc-700 mono"></span>
+        <div class="ml-auto flex items-center gap-4">
+            <span class="mono text-zinc-600" id="currentUser"></span>
+            <span class="px-3 py-1 bg-zinc-900 rounded text-xs text-green-400 border border-green-900">Wallet: <span
+                    id="walletBalance">142.8</span> XMR</span>
+            <a href="../../cyberhub.html" onclick="localStorage.removeItem('cyberhub_user')"
+                class="text-red-500 hover:underline">Quitter</a>
+        </div>
+    </div>
+
+    <div style="padding-top:32px" class="flex flex-1">
+        <!-- LEFT SIDEBAR - ENRICHED -->
+        <aside
+            class="hidden xl:flex w-72 bg-[#0a0a0f] border-r border-[#2a0a0a] py-8 px-5 flex-col flex-shrink-0 overflow-y-auto">
+            <div class="flex items-center gap-3 mb-8">
+                <i class="fa-solid fa-skull-crossbones text-3xl" style="color:#ff2d55;"></i>
+                <span class="font-black text-2xl neon-text" style="font-family:'Space Grotesk',sans-serif">THE
+                    BAZAAR</span>
+            </div>
+
+            <div class="mb-8">
+                <div class="mono text-xs text-red-400 mb-3">FILTRES RARITÉ</div>
+                <div class="flex flex-wrap gap-2" id="rarityFilters">
+                    <button onclick="filterByRarity('all')" class="cat-btn active">ALL</button>
+                    <button onclick="filterByRarity('common')" class="cat-btn">COMMON</button>
+                    <button onclick="filterByRarity('rare')" class="cat-btn">RARE</button>
+                    <button onclick="filterByRarity('epic')" class="cat-btn">EPIC</button>
+                    <button onclick="filterByRarity('legendary')" class="cat-btn">LEGENDARY</button>
+                    <button onclick="filterByRarity('mythic')" class="cat-btn">MYTHIC</button>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <div class="mono text-xs text-red-400 mb-3">LEADERBOARD VENDEURS</div>
+                <div id="leaderboard" class="space-y-3"></div>
+            </div>
+
+            <div class="mt-auto">
+                <div class="mono text-xs text-red-400 mb-3">STATS GLOBALES</div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div class="bg-zinc-900 p-3 rounded-xl">Volume 24h<br><span class="text-green-400 font-mono">1.284
+                            XMR</span></div>
+                    <div class="bg-zinc-900 p-3 rounded-xl">Deals réussis<br><span
+                            class="text-green-400 font-mono">47</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <div class="mono text-xs text-amber-400">// MARCHÉ NOIR SOUTERRAIN 2026</div>
+                    <h1 class="text-5xl font-black neon-text" style="font-family:'Space Grotesk',sans-serif">THE BAZAAR
+                    </h1>
+                    <p class="text-zinc-400">Échange. Négocie. Domine.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="showSellModal()" class="danger-btn flex items-center gap-2"><i
+                            class="fa-solid fa-hand-holding-dollar"></i> METTRE EN VENTE</button>
+                    <button onclick="showTradeModal()"
+                        class="bg-zinc-900 hover:bg-zinc-800 border border-amber-500 text-amber-400 px-6 py-3 rounded-xl flex items-center gap-2"><i
+                            class="fa-solid fa-arrows-rotate"></i> TRADE P2P</button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="flex gap-4 mb-8">
+                <div class="search-wrap flex-1">
+                    <i class="ico fa-solid fa-magnifying-glass"></i>
+                    <input id="searchInput" type="text" oninput="filterBazaar()"
+                        placeholder="Rechercher exploit, crack, service..."
+                        class="w-full bg-[#0d0d11] border border-[#1e1e28] rounded-2xl px-5 py-4 pl-12" />
+                </div>
+                <select id="sortSelect" onchange="filterBazaar()"
+                    class="bg-[#0d0d11] border border-[#1e1e28] rounded-2xl px-5 py-4">
+                    <option value="default">Trier par défaut</option>
+                    <option value="price-low">Prix croissant</option>
+                    <option value="price-high">Prix décroissant</option>
+                    <option value="rarity">Rareté</option>
+                </select>
+            </div>
+
+            <div id="bazaarGrid" class="bazaar-grid"></div>
+        </main>
+
+        <!-- RIGHT SIDEBAR - FULLY FUNCTIONAL -->
+        <aside
+            class="hidden 2xl:flex w-72 bg-[#0a0a0f] border-l border-[#2a0a0a] py-8 px-5 flex-col flex-shrink-0 overflow-y-auto">
+            <h3 class="mono text-xs text-red-400 mb-4">MON COMPTE BAZAAR</h3>
+            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-red-900/30 rounded-full flex items-center justify-center text-2xl">👤</div>
+                    <div>
+                        <div class="font-bold" id="sidebarUsername"></div>
+                        <div class="text-xs text-green-400">Reputation ★ 4.92</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="mono text-xs text-red-400 mb-4">MES OFFRES ACTIVES</h3>
+            <div id="myOffers" class="space-y-3 mb-8"></div>
+
+            <h3 class="mono text-xs text-red-400 mb-4">TRADES RÉCENTS</h3>
+            <div id="recentTrades" class="space-y-3 text-xs"></div>
+
+            <div class="mt-auto pt-8">
+                <button onclick="showTradeModal()" class="w-full danger-btn py-3 mb-3">OUVRIR TRADE P2P</button>
+                <button onclick="alert('Escrow Service activé - Protection 100%')"
+                    class="w-full border border-amber-500 text-amber-400 py-3 rounded-xl">🔒 ESCROW</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Sell Modal -->
+    <div id="sellModal"
+        class="fixed inset-0 bg-black/95 backdrop-blur-lg z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-red-900/60 rounded-3xl max-w-lg w-full p-8">
+            <h3 class="text-2xl font-bold neon-text mb-6">Nouvelle Offre</h3>
+            <input id="sellTitle" class="w-full mb-4 bg-black border border-zinc-700 rounded-2xl px-5 py-4"
+                placeholder="Nom de l'offre" />
+            <textarea id="sellDesc" rows="4" class="w-full mb-4 bg-black border border-zinc-700 rounded-2xl px-5 py-4"
+                placeholder="Description + proof"></textarea>
+            <div class="grid grid-cols-2 gap-4">
+                <input id="sellPrice" type="text" class="bg-black border border-zinc-700 rounded-2xl px-5 py-4"
+                    placeholder="Prix XMR" />
+                <select id="sellRarity" class="bg-black border border-zinc-700 rounded-2xl px-5 py-4">
+                    <option value="rare">RARE</option>
+                    <option value="epic">EPIC</option>
+                    <option value="legendary">LEGENDARY</option>
+                    <option value="mythic">MYTHIC</option>
+                </select>
+            </div>
+            <div class="flex gap-4 mt-8">
+                <button onclick="publishSell()" class="danger-btn flex-1 py-4">PUBLIER</button>
+                <button onclick="closeSellModal()"
+                    class="flex-1 py-4 border border-zinc-700 rounded-2xl">ANNULER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('shadow_authenticated')) window.location.href = '../../shadow-gate.html';
+
+        const uname = localStorage.getItem('cyberhub_username') || 'ShadowGhost';
+        document.getElementById('currentUser').textContent = uname;
+        document.getElementById('sidebarUsername').textContent = uname;
+        document.getElementById('onlineBadge').textContent = `${180 + Math.floor(Math.random() * 70)} marchands en ligne`;
+
+        let BAZAAR_ITEMS = [ /* même liste que avant */
+            { id: 1, name: "0day Chrome RCE 2026", rarity: "mythic", price: 45.0, currency: "XMR", desc: "Exploit zero-day non divulgué", tag: "EXPLOIT", seller: "0xVoid", rating: 4.9 },
+            { id: 2, name: "Windows 11 LTSC HWID Permanent", rarity: "legendary", price: 8.5, currency: "XMR", desc: "Activation toutes éditions", tag: "CRACK", seller: "WarezKing", rating: 4.7 },
+            { id: 3, name: "Undetected RAT + C2 Panel", rarity: "epic", price: 22.0, currency: "XMR", desc: "Source complète + builder", tag: "MALWARE", seller: "PhantomByte", rating: 4.8 },
+            { id: 4, name: "1.8M Fresh EU Logs 2026", rarity: "epic", price: 31.0, currency: "XMR", desc: "Combo email:pass + cookies", tag: "DUMP", seller: "GhostNet", rating: 4.5 },
+            { id: 5, name: "Custom Polymorphic Crypter", rarity: "legendary", price: 67.0, currency: "XMR", desc: "FUD 180 jours garanti", tag: "TOOL", seller: "DarkCracker", rating: 5.0 },
+            { id: 6, name: "Netflix/Disney+/Spotify Lifetime", rarity: "rare", price: 4.8, currency: "USDT", desc: "Comptes partagés premium", tag: "ACCOUNTS", seller: "ShadowVault", rating: 4.3 },
+        ];
+
+        let myOffers = JSON.parse(localStorage.getItem('myBazaarOffers') || '[]');
+
+        function getRarityClass(r) { return r || 'common'; }
+
+        function createItemCard(item) {
+            return `<div class="item-card bg-zinc-950 rounded-3xl overflow-hidden cursor-pointer" onclick="viewItem(${item.id})">
+            <div class="h-52 relative bg-gradient-to-br from-zinc-900 to-black flex items-center justify-center">
+                <div class="card-overlay"></div>
+                <div class="absolute top-4 right-4"><span class="warez-badge rarity-${getRarityClass(item.rarity)}">${item.rarity.toUpperCase()}</span></div>
+                <div class="text-7xl opacity-10 font-black">${item.tag}</div>
+            </div>
+            <div class="p-6">
+                <h3 class="font-bold text-lg mb-2">${item.name}</h3>
+                <p class="text-zinc-400 text-sm mb-4 line-clamp-3">${item.desc}</p>
+                <div class="flex justify-between items-end">
+                    <div><div class="text-3xl font-mono text-red-400">${item.price} ${item.currency}</div><div class="text-xs text-zinc-500">par ${item.seller}</div></div>
+                    <button onclick="event.stopImmediatePropagation(); buyItem(${item.id});" class="danger-btn text-xs px-7 py-2.5">ACQUÉRIR</button>
+                </div>
+            </div>
+        </div>`;
+        }
+
+        function renderBazaar(items) { document.getElementById('bazaarGrid').innerHTML = items.map(createItemCard).join(''); }
+        function filterBazaar() { /* même logique que avant */
+            let filtered = [...BAZAAR_ITEMS];
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            if (q) filtered = filtered.filter(i => i.name.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q));
+            renderBazaar(filtered);
+        }
+        function filterByRarity(r) {
+            document.querySelectorAll('#rarityFilters button').forEach(b => b.classList.remove('active'));
+            if (r === 'all') renderBazaar(BAZAAR_ITEMS);
+            else renderBazaar(BAZAAR_ITEMS.filter(i => i.rarity === r));
+        }
+
+        function viewItem(id) { /* modal */
+            const item = BAZAAR_ITEMS.find(i => i.id === id);
+            ShadowHub.showModal(`<h2 class="text-3xl">${item.name}</h2><p>${item.desc}</p><button onclick="buyItem(${id});ShadowHub.closeModal()" class="danger-btn w-full mt-6 py-4">ACHETER</button>`);
+        }
+        function buyItem(id) { showToast(`Achat lancé : ${BAZAAR_ITEMS.find(i => i.id === id).name}`); }
+
+        function showSellModal() { document.getElementById('sellModal').classList.remove('hidden'); }
+        function closeSellModal() { document.getElementById('sellModal').classList.add('hidden'); }
+
+        function publishSell() {
+            const title = document.getElementById('sellTitle').value;
+            if (title) {
+                myOffers.unshift({ title, price: document.getElementById('sellPrice').value || '??', status: 'active' });
+                localStorage.setItem('myBazaarOffers', JSON.stringify(myOffers));
+                renderMyOffers();
+                showToast('Offre publiée avec succès', 'success');
+                closeSellModal();
+            }
+        }
+
+        function renderMyOffers() {
+            const cont = document.getElementById('myOffers');
+            cont.innerHTML = myOffers.length ? myOffers.map(o => `<div class="p-3 bg-zinc-900 rounded-xl">${o.title} — ${o.price} XMR</div>`).join('') : '<div class="text-zinc-500 text-xs">Aucune offre active</div>';
+        }
+
+        function renderLeaderboard() {
+            const leaders = [
+                { name: "0xVoid", rep: "4.98", sales: "87" },
+                { name: "PhantomByte", rep: "4.91", sales: "64" },
+                { name: "DarkCracker", rep: "4.85", sales: "52" }
+            ];
+            document.getElementById('leaderboard').innerHTML = leaders.map(l => `<div class="flex justify-between bg-zinc-900 p-3 rounded-xl"><span>${l.name}</span><span class="text-green-400">${l.rep} ★ (${l.sales})</span></div>`).join('');
+        }
+
+        function renderRecentTrades() {
+            const trades = ["Achat RAT 22 XMR", "Vente 0day Chrome", "Dump EU 31 XMR"];
+            document.getElementById('recentTrades').innerHTML = trades.map(t => `<div class="p-3 bg-zinc-900/70 rounded-xl">${t}</div>`).join('');
+        }
+
+        function showTradeModal() { showToast("Interface Trade P2P ouverte - Wallet connecté", "info"); }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl border border-green-500 bg-black text-sm toast`;
+            t.innerHTML = `<i class="fa-solid fa-bolt mr-2"></i>${msg}`;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBazaar(BAZAAR_ITEMS);
+            renderMyOffers();
+            renderLeaderboard();
+            renderRecentTrades();
+            console.log('%cThe Bazaar v4.0 — Sidebars fully operational', 'color:#ff2d55;font-weight:bold');
+        });
+    </script>
+</body>
+
+</html>

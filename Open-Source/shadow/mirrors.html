@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SHADOWHUB // MIRRORS & LIENS DIRECTS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="data/css/style.css" />
+    <script src="js/core.js"></script>
+    <script src="js/main.js"></script>
+</head>
+<body class="bg-[#020203] text-zinc-200">
+
+    <!-- TOP BAR -->
+    <div class="fixed top-0 left-0 right-0 h-9 bg-black border-b border-red-900 z-50 flex items-center px-8 text-xs uppercase tracking-widest">
+        <span class="text-red-500">● MIRRORS NETWORK — 89 ACTIFS</span>
+    </div>
+
+    <main class="pt-12 max-w-screen-2xl mx-auto px-8">
+        <div class="mb-12">
+            <h1 class="text-6xl font-black tracking-tighter text-red-400">MIRRORS &amp; LIENS DIRECTS</h1>
+            <p class="text-xl text-zinc-400">Réseau de mirrors décentralisé • Mise à jour toutes les heures</p>
+        </div>
+
+        <!-- Status des mirrors -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div class="bg-emerald-950 border border-emerald-700 rounded-3xl p-8">
+                <div class="flex items-center gap-4">
+                    <span class="text-4xl">🟢</span>
+                    <div>
+                        <div class="font-bold">Mega.nz Mirror</div>
+                        <div class="text-emerald-400 text-sm">1248 fichiers • 98% UP</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-amber-950 border border-amber-700 rounded-3xl p-8">
+                <div class="flex items-center gap-4">
+                    <span class="text-4xl">🟡</span>
+                    <div>
+                        <div class="font-bold">MediaFire Cluster</div>
+                        <div class="text-amber-400 text-sm">742 fichiers • 87% UP</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-red-950 border border-red-700 rounded-3xl p-8">
+                <div class="flex items-center gap-4">
+                    <span class="text-4xl">🔴</span>
+                    <div>
+                        <div class="font-bold">Google Drive Temp</div>
+                        <div class="text-red-400 text-sm">319 fichiers • 64% UP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des mirrors par catégorie -->
+        <h2 class="text-4xl font-bold mb-10">MIRRORS PAR CATÉGORIE</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Cracks -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8">
+                <h3 class="text-red-400 text-xl mb-6 flex items-center gap-3"><i class="fa-solid fa-key"></i> Cracks &amp; Activators</h3>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center p-4 bg-zinc-900 rounded-2xl">
+                        <span>Windows 11 HWID Pack</span>
+                        <button onclick="requestMirror('Windows 11 HWID Pack','mega.nz')" class="text-emerald-400 hover:text-emerald-300">MEGA →</button>
+                    </div>
+                    <div class="flex justify-between items-center p-4 bg-zinc-900 rounded-2xl">
+                        <span>Adobe 2026 Full</span>
+                        <button onclick="requestMirror('Adobe 2026 Full','mediafire')" class="text-emerald-400 hover:text-emerald-300">MediaFire →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Android -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8">
+                <h3 class="text-red-400 text-xl mb-6 flex items-center gap-3"><i class="fa-solid fa-mobile"></i> Android Premium</h3>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center p-4 bg-zinc-900 rounded-2xl">
+                        <span>Spotify + Netflix Mod</span>
+                        <button onclick="requestMirror('Spotify + Netflix Mod','direct')" class="text-emerald-400 hover:text-emerald-300">Direct →</button>
+                    </div>
+                    <div class="flex justify-between items-center p-4 bg-zinc-900 rounded-2xl">
+                        <span>YouTube Premium APK</span>
+                        <button onclick="requestMirror('YouTube Premium APK','torrent')" class="text-emerald-400 hover:text-emerald-300">Torrent →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Note importante -->
+        <div class="mt-20 bg-red-950/30 border border-red-900 rounded-3xl p-10 text-center">
+            <p class="text-red-400 text-lg">Les mirrors tombent souvent. Utilise toujours un VPN + JDownloader. Les liens sont mis à jour toutes les heures.</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('%cMirrors page chargée', 'color: #ef4444');
+        });
+    </script>
+    <script>
+        // Demo-safe mirror request helper
+        function requestMirror(name, dest){
+            const html = `<h3 class="text-red-400 font-bold">REQUEST MIRROR</h3><p class="mt-2 text-zinc-300">Demande simulée pour <strong>${name}</strong> via <strong>${dest}</strong>. Les liens réels sont désactivés dans cette démonstration.</p>`;
+            if(window.ShadowHub && ShadowHub.showModal) return ShadowHub.showModal(html);
+            alert(`Demande demo: ${name} -> ${dest}`);
+        }
+    </script>
+</body>
+</html>

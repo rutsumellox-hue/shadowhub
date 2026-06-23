@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SHADOW ARCADE — PreHacks 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../data/css/style.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            font-family: 'Press Start 2P', system-ui;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background: #111;
+            border: 3px solid #00ff00;
+            padding: 12px;
+            transition: all 0.3s;
+            image-rendering: pixelated;
+        }
+
+        .game-card:hover {
+            border-color: #ff2d55;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #ff2d55;
+        }
+
+        .crt {
+            position: relative;
+        }
+
+        .crt::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(transparent 0px, transparent 3px, rgba(0, 255, 0, 0.07) 3px, rgba(0, 255, 0, 0.07) 6px);
+            pointer-events: none;
+            animation: scan 6s linear infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 300px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#0a0a0a] text-[#00ff00] min-h-screen crt scanlines">
+
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- HEADER -->
+        <div class="border-b-4 border-[#00ff00] pb-4 mb-8 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="text-4xl">🎮</div>
+                <div>
+                    <div class="text-3xl tracking-widest neon-text">PREHACKS</div>
+                    <div class="text-xs text-red-400">SHADOW ARCADE v2026 — HACKED EDITION</div>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm">CONNECTED AS: <span class="text-yellow-400">${uname || 'ANON'}</span></div>
+                <div class="text-xs text-zinc-400">469 users online • 75k hacks today</div>
+            </div>
+        </div>
+
+        <!-- NAV -->
+        <div class="flex gap-6 mb-8 text-sm border-b border-zinc-800 pb-4">
+            <a href="#" class="text-red-400 hover:underline">ALL GAMES</a>
+            <a href="#" class="hover:underline">FEATURED</a>
+            <a href="#" class="hover:underline">MOST POPULAR</a>
+            <a href="#" class="hover:underline">TOP RATED</a>
+            <a href="#" class="hover:underline">NEW HACKS</a>
+        </div>
+
+        <!-- MOST POPULAR -->
+        <div class="mb-12">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-xl text-yellow-400">MONTHLY MOST POPULAR</h2>
+                <span class="text-xs text-zinc-400">16538 hacked games</span>
+            </div>
+            <div id="popularGrid" class="game-grid"></div>
+        </div>
+
+        <!-- ALL GAMES GRID -->
+        <div>
+            <h2 class="text-xl mb-6 text-red-400">ALL HACKED TOOLS & GAMES</h2>
+            <div id="allGamesGrid" class="game-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        const popularGames = [
+            { name: "Stick War: Legacy", plays: "4760", type: "STRATEGY" },
+            { name: "Kingdom Rush", plays: "3892", type: "TOWER DEFENSE" },
+            { name: "Strike Force Heroes 2", plays: "3612", type: "SHOOTER" },
+            { name: "Raze 2", plays: "2926", type: "ACTION" },
+            { name: "Age of War", plays: "2454", type: "STRATEGY" },
+        ];
+
+        const allGames = [
+            { name: "SQL Injection Master", plays: "1248", type: "PENTEST" },
+            { name: "Ghidra Reverse", plays: "987", type: "REVERSE" },
+            { name: "RAT Builder 2026", plays: "856", type: "MALWARE" },
+            { name: "WiFi Cracker", plays: "743", type: "WIRELESS" },
+            { name: "0day Exploit Arena", plays: "621", type: "EXPLOIT" },
+            { name: "Tor Shadow Run", plays: "589", type: "ANON" },
+            { name: "Dump Analyzer", plays: "512", type: "FORENSICS" },
+            { name: "Crypto Miner Hack", plays: "478", type: "CRYPTO" },
+        ];
+
+        function createGameCard(game) {
+            return `
+            <div onclick="launchGame('${game.name}')" class="game-card p-4 cursor-pointer">
+                <div class="h-40 bg-zinc-900 flex items-center justify-center text-4xl mb-4 border border-[#00ff00]/30">
+                    🎮
+                </div>
+                <div class="font-bold text-sm mb-1">${game.name}</div>
+                <div class="text-[10px] text-yellow-400">${game.type}</div>
+                <div class="text-[10px] text-zinc-400 mt-2">${game.plays} plays</div>
+            </div>
+        `;
+        }
+
+        function renderGrids() {
+            document.getElementById('popularGrid').innerHTML = popularGames.map(createGameCard).join('');
+            document.getElementById('allGamesGrid').innerHTML = allGames.map(createGameCard).join('');
+        }
+
+        function launchGame(name) {
+            alert(`\n\n▶️ LAUNCHING ${name.toUpperCase()}...\n\nHACK MODE ENABLED\n\n[ PREHACKS ARCADE SIMULATOR RUNNING ]\n\nHIGH SCORE MULTIPLIER x3`);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrids();
+            console.log('%cSHADOW PREHACKS ARCADE LOADED', 'color:#00ff00; font-family:monospace');
+        });
+    </script>
+</body>
+
+</html>

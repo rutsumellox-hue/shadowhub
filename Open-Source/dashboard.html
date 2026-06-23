@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberHub // Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@600;700;800&display=swap');
+
+    :root {
+      --red: #ff2d55;
+      --green: #00ff88;
+      --purple: #7c3aed;
+      --amber: #f59e0b;
+    }
+
+    body {
+      background: #070709;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #e4e4e7;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .sans {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .sidebar {
+      background: #0a0a0d;
+      border-right: 1px solid #1a1a22;
+      width: 240px;
+      flex-shrink: 0;
+    }
+
+    .side-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: .8rem;
+      color: #71717a;
+      transition: all .15s;
+      cursor: pointer;
+    }
+
+    .side-link:hover {
+      background: rgba(255, 45, 85, .08);
+      color: #fff;
+    }
+
+    .side-link.active {
+      background: rgba(255, 45, 85, .12);
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .side-link i {
+      width: 16px;
+      text-align: center;
+      font-size: .85rem;
+    }
+
+    .card {
+      background: #0d0d11;
+      border: 1px solid #1e1e28;
+      border-radius: 12px;
+    }
+
+    .stat-big {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--red);
+      text-shadow: 0 0 16px rgba(255, 45, 85, .4);
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .tag-red {
+      background: rgba(255, 45, 85, .15);
+      color: var(--red);
+      border: 1px solid rgba(255, 45, 85, .25);
+    }
+
+    .tag-green {
+      background: rgba(0, 255, 136, .1);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 136, .2);
+    }
+
+    .tag-purple {
+      background: rgba(124, 58, 237, .15);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, .25);
+    }
+
+    .tag-amber {
+      background: rgba(245, 158, 11, .15);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, .25);
+    }
+
+    .quick-btn {
+      background: #111116;
+      border: 1px solid #1e1e28;
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--red);
+      background: rgba(255, 45, 85, .05);
+    }
+
+    .quick-btn i {
+      font-size: 1.2rem;
+    }
+
+    .notif-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+    }
+
+    .activity-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #0f0f14;
+    }
+
+    .activity-row:last-child {
+      border-bottom: none;
+    }
+
+    .progress {
+      background: #1e1e28;
+      border-radius: 2px;
+      height: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+    }
+
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      flex-shrink: 0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #070709;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3f3f46;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP BAR -->
+  <div
+    class="h-9 bg-black border-b border-zinc-900 flex items-center px-5 text-xs gap-5 mono text-zinc-600 flex-shrink-0">
+    <span class="text-red-500 flex items-center gap-2"><span
+        class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>SYSTÈME EN LIGNE</span>
+    <span id="currentTime" class="text-zinc-700"></span>
+    <span class="ml-auto flex items-center gap-4">
+      <span>Bienvenue, <span id="navUser" class="text-zinc-300"></span></span>
+      <a href="cyberhub.html" onclick="localStorage.removeItem('cyberhub_user')"
+        class="text-red-500 hover:underline">Déconnexion</a>
+    </span>
+  </div>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar hidden lg:flex flex-col py-6 px-3 gap-1 overflow-y-auto">
+      <div class="flex items-center gap-2 px-3 mb-6">
+        <i class="fa-solid fa-microchip text-xl" style="color:var(--red)"></i>
+        <span class="font-bold text-base sans">Cyber<span style="color:var(--red)">Hub</span></span>
+      </div>
+
+      <div class="side-link active" onclick="location.href='dashboard.html'">
+        <i class="fa-solid fa-gauge"></i> Dashboard
+      </div>
+      <div class="side-link" onclick="location.href='#articles'">
+        <i class="fa-solid fa-newspaper"></i> Articles
+      </div>
+      <div class="side-link" onclick="location.href='shadow/forum.html'">
+        <i class="fa-solid fa-comments"></i> Forum
+        <span class="ml-auto tag tag-red">12</span>
+      </div>
+      <div class="side-link" onclick="location.href='shadow/news.html'">
+        <i class="fa-solid fa-bolt"></i> Actus
+      </div>
+      <div class="side-link" onclick="location.href='shadow/catalogue.html'">
+        <i class="fa-solid fa-layer-group"></i> Catalogue
+      </div>
+      <div class="side-link" onclick="location.href='shadow/compte.html'">
+        <i class="fa-solid fa-user"></i> Compte
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-zinc-900">
+        <div class="px-3 mb-2 text-xs text-zinc-700 uppercase tracking-widest mono">Zone Shadow</div>
+        <div class="side-link" onclick="location.href='shadow-gate.html'">
+          <i class="fa-solid fa-skull-crossbones text-red-700"></i> <span class="text-zinc-600">Shadow Gate</span>
+        </div>
+      </div>
+
+      <div class="mt-auto px-3">
+        <div class="card p-3 text-xs mono text-zinc-600">
+          <div class="text-zinc-500 mb-1">Membre depuis</div>
+          <div class="text-white font-bold">Aujourd'hui</div>
+          <div class="progress mt-2">
+            <div class="progress-fill" style="width:5%"></div>
+          </div>
+          <div class="text-zinc-700 mt-1">5 / 100 XP</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+      <!-- Welcome -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold sans">Bonjour, <span id="welcomeUser" class="text-red-400"></span> 👋</h1>
+          <div class="mono text-xs text-zinc-600 mt-1">Voici l'état de ta session // <span id="dateStr"></span></div>
+        </div>
+        <a href="shadow-gate.html"
+          class="hidden md:flex items-center gap-2 bg-red-950/40 border border-red-900/40 text-red-400 text-xs mono px-4 py-2.5 rounded-lg hover:bg-red-950/60 transition">
+          <i class="fa-solid fa-skull-crossbones"></i> Zone Shadow
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="card p-5">
+          <div class="text-xs mono text-zinc-600 uppercase mb-2">Articles lus</div>
+          <div class="stat-big">0</div>
+          <div class="text-xs text-zinc-600 mt-1">— / accès illimité</div>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs mono text-zinc-600 uppercase mb-2">Messages forum</div>
+          <div class="stat-big">0</div>
+          <div class="text-xs text-zinc-600 mt-1">Nouveau membre</div>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs mono text-zinc-600 uppercase mb-2">Membres en ligne</div>
+          <div class="stat-big text-green-400" style="text-shadow:0 0 16px rgba(0,255,136,.4)" id="onlineCount">1248
+          </div>
+          <div class="text-xs text-zinc-600 mt-1 flex items-center gap-1.5"><span class="online-dot"></span>Live</div>
+        </div>
+        <div class="card p-5">
+          <div class="text-xs mono text-zinc-600 uppercase mb-2">Niveau</div>
+          <div class="stat-big text-amber-400" style="text-shadow:0 0 16px rgba(245,158,11,.4)">1</div>
+          <div class="text-xs text-zinc-600 mt-1">Rang : Newbie</div>
+        </div>
+      </div>
+
+      <!-- Quick access -->
+      <div>
+        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-widest mono mb-3">Accès rapide</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="quick-btn" onclick="location.href='shadow/forum.html'">
+            <i class="fa-solid fa-comments text-red-400"></i>
+            <div class="text-sm font-semibold">Forum</div>
+            <div class="text-xs mono text-zinc-600">12 nouveaux sujets</div>
+          </div>
+          <div class="quick-btn" onclick="location.href='shadow/news.html'">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <div class="text-sm font-semibold">Actus</div>
+            <div class="text-xs mono text-zinc-600">5 articles récents</div>
+          </div>
+          <div class="quick-btn" onclick="location.href='shadow/catalogue.html'">
+            <i class="fa-solid fa-layer-group text-purple-400"></i>
+            <div class="text-sm font-semibold">Catalogue</div>
+            <div class="text-xs mono text-zinc-600">847 ressources</div>
+          </div>
+          <div class="quick-btn" onclick="location.href='shadow/compte.html'">
+            <i class="fa-solid fa-user-cog text-zinc-400"></i>
+            <div class="text-sm font-semibold">Mon compte</div>
+            <div class="text-xs mono text-zinc-600">Paramètres</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Activité récente -->
+        <div class="card p-5 lg:col-span-2">
+          <h2 class="text-sm font-semibold mb-4 sans">Activité récente // Forum</h2>
+          <div>
+            <div class="activity-row">
+              <div class="w-8 h-8 rounded-lg bg-red-950/40 flex items-center justify-center flex-shrink-0"><i
+                  class="fa-solid fa-fire text-red-400 text-xs"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium line-clamp-1">Reverse Engineering 101 // Ghidra</div>
+                <div class="mono text-xs text-zinc-600">34 réponses · 240 vues · il y a 1h</div>
+              </div>
+              <span class="tag tag-red flex-shrink-0">HOT</span>
+            </div>
+            <div class="activity-row">
+              <div class="w-8 h-8 rounded-lg bg-purple-950/40 flex items-center justify-center flex-shrink-0"><i
+                  class="fa-solid fa-code text-purple-400 text-xs"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium line-clamp-1">SQL Injection // Union-based avancé</div>
+                <div class="mono text-xs text-zinc-600">12 réponses · 98 vues · il y a 3h</div>
+              </div>
+              <span class="tag tag-purple flex-shrink-0">WEB</span>
+            </div>
+            <div class="activity-row">
+              <div class="w-8 h-8 rounded-lg bg-amber-950/40 flex items-center justify-center flex-shrink-0"><i
+                  class="fa-solid fa-wifi text-amber-400 text-xs"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium line-clamp-1">Aircrack-ng sur WPA3 // faisable en 2026 ?</div>
+                <div class="mono text-xs text-zinc-600">7 réponses · 56 vues · il y a 6h</div>
+              </div>
+              <span class="tag tag-amber flex-shrink-0">WiFi</span>
+            </div>
+            <div class="activity-row">
+              <div class="w-8 h-8 rounded-lg bg-green-950/40 flex items-center justify-center flex-shrink-0"><i
+                  class="fa-solid fa-shield text-green-400 text-xs"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium line-clamp-1">Stack Tor + VPN + Tails 2026</div>
+                <div class="mono text-xs text-zinc-600">22 réponses · 175 vues · il y a 9h</div>
+              </div>
+              <span class="tag tag-green flex-shrink-0">ANON</span>
+            </div>
+          </div>
+          <a href="shadow/forum.html"
+            class="block text-center mono text-xs text-zinc-600 hover:text-red-400 transition mt-4">Voir tout le forum
+            →</a>
+        </div>
+
+        <!-- Membres en ligne -->
+        <div class="card p-5">
+          <h2 class="text-sm font-semibold mb-4 sans flex items-center gap-2">
+            Membres en ligne <span class="ml-auto tag tag-green mono">LIVE</span>
+          </h2>
+          <div class="space-y-2" id="onlineList"></div>
+          <a href="shadow/forum.html"
+            class="block text-center mono text-xs text-zinc-600 hover:text-red-400 transition mt-4">Rejoindre le forum
+            →</a>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    if (!localStorage.getItem('cyberhub_user')) window.location.href = 'login.html';
+
+    const user = localStorage.getItem('cyberhub_username') || localStorage.getItem('cyberhub_user') || 'Anonyme';
+    const displayName = user.includes('@') ? user.split('@')[0] : user;
+    document.getElementById('navUser').textContent = displayName;
+    document.getElementById('welcomeUser').textContent = displayName;
+
+    // Date
+    const now = new Date();
+    document.getElementById('dateStr').textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Clock
+    function updateTime() {
+      const t = new Date();
+      document.getElementById('currentTime').textContent = t.toLocaleTimeString('fr-FR');
+    }
+    updateTime(); setInterval(updateTime, 1000);
+
+    // Online count fluctuation
+    setInterval(() => {
+      const n = 1240 + Math.floor(Math.random() * 20);
+      document.getElementById('onlineCount').textContent = n;
+    }, 5000);
+
+    // Fake online members
+    const members = [
+      { name: '0xVoid', rank: 'Shadow', rankClass: 'text-red-400' },
+      { name: 'WarezKing', rank: 'VIP', rankClass: 'text-amber-400' },
+      { name: 'DarkCracker', rank: 'Membre', rankClass: 'text-zinc-500' },
+      { name: 'ModoShadow', rank: 'Modo', rankClass: 'text-purple-400' },
+      { name: 'PhantomByte', rank: 'Membre', rankClass: 'text-zinc-500' },
+      { name: 'GhostNet', rank: 'Membre', rankClass: 'text-zinc-500' },
+      { name: 'NullPointer', rank: 'VIP', rankClass: 'text-amber-400' },
+    ];
+    const list = document.getElementById('onlineList');
+    members.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2 text-xs py-1';
+      div.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" style="box-shadow:0 0 5px #00ff88"></span><span class="flex-1">${m.name}</span><span class="${m.rankClass} mono text-xs">${m.rank}</span>`;
+      list.appendChild(div);
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+/* Bazaar page styles extracted from forum-the-bazaar.html */
+
+.case-card { transition: all 0.3s; border: 1px solid #1f1f2e; position: relative; overflow: hidden; }
+.case-card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px -10px rgba(239,68,68,0.2); border-color: #ef4444; }
+.case-card.rare { border-color: #3b82f6 }
+.case-card.epic { border-color: #a855f7 }
+.case-card.legendary { border-color: #f59e0b }
+.case-card.mythic { border-color: #ef4444; animation: mythicGlow 2s infinite alternate; }
+
+@keyframes mythicGlow { from{ box-shadow: 0 0 10px #ef4444 } to{ box-shadow: 0 0 30px #ef4444, 0 0 60px #a855f7 } }
+
+.rarity-common { background: #6b7280 }
+.rarity-rare { background: #3b82f6 }
+.rarity-epic { background: #a855f7 }
+.rarity-legendary { background: #f59e0b }
+.rarity-mythic { background: linear-gradient(90deg,#ef4444,#a855f7) }
+
+.modal-overlay { background: rgba(0,0,0,0.9); backdrop-filter: blur(4px) }
+
+.tab-btn.active { border-bottom: 2px solid #ef4444; color: #ef4444 }
+.tab-btn { transition: color 0.2s; cursor: pointer }
+
+.particle { position: absolute; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; animation: particleFly 1s ease-out forwards }
+@keyframes particleFly { 0%{ opacity:1; transform: translate(0,0) scale(1) } 100%{ opacity:0; transform: translate(var(--tx), var(--ty)) scale(0) } }
+
+.opening-reveal { animation: revealScale 0.5s ease }
+@keyframes revealScale { 0%{ transform: scale(0); opacity:0 } 100%{ transform: scale(1); opacity:1 } }

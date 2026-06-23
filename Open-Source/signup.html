@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberHub // Inscription</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@600;700;800&display=swap');
+
+    :root {
+      --red: #ff2d55;
+      --green: #00ff88;
+    }
+
+    body {
+      background: #070709;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #e4e4e7;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .bg-grid {
+      background-image: linear-gradient(rgba(255, 45, 85, .04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 45, 85, .04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .panel {
+      background: #0d0d11;
+      border: 1px solid #1e1e28;
+      border-radius: 12px;
+    }
+
+    .inp {
+      width: 100%;
+      background: #070709;
+      border: 1px solid #1e1e28;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #e4e4e7;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .inp:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 2px rgba(255, 45, 85, .15);
+    }
+
+    .inp::placeholder {
+      color: #52525b;
+    }
+
+    .btn-main {
+      width: 100%;
+      background: linear-gradient(135deg, #be0000, var(--red));
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 13px;
+      border: none;
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: 0 0 20px rgba(255, 45, 85, .25);
+    }
+
+    .btn-main:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 32px rgba(255, 45, 85, .5);
+    }
+
+    .btn-main:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .scanlines {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, .06) 2px, rgba(0, 0, 0, .06) 4px);
+      z-index: 999;
+    }
+
+    label {
+      display: block;
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #71717a;
+      margin-bottom: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .err {
+      background: rgba(255, 45, 85, .1);
+      border: 1px solid rgba(255, 45, 85, .3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--red);
+      font-size: .8rem;
+      display: none;
+    }
+
+    .strength {
+      height: 3px;
+      border-radius: 2px;
+      background: #1e1e28;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .strength-fill {
+      height: 100%;
+      transition: width .3s, background .3s;
+      border-radius: 2px;
+    }
+
+    .check {
+      font-size: .72rem;
+      color: #52525b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .check.ok {
+      color: var(--green);
+    }
+
+    .check i {
+      width: 10px;
+    }
+  </style>
+</head>
+
+<body class="bg-grid min-h-screen flex items-center justify-center px-4 py-12">
+  <div class="scanlines"></div>
+
+  <div style="width:100%;max-width:440px">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <a href="cyberhub.html"
+        class="inline-flex items-center gap-2 text-zinc-500 text-xs mono hover:text-zinc-300 transition mb-6">
+        <i class="fa-solid fa-arrow-left"></i> Retour CyberHub
+      </a>
+      <div class="flex justify-center items-center gap-2 mb-2">
+        <i class="fa-solid fa-microchip text-2xl" style="color:var(--red);filter:drop-shadow(0 0 8px var(--red))"></i>
+        <span class="text-xl font-bold" style="font-family:'Space Grotesk',sans-serif">Cyber<span
+            style="color:var(--red)">Hub</span></span>
+      </div>
+      <div class="mono text-xs text-zinc-600">CRÉATION DE COMPTE // ACCÈS GRATUIT</div>
+    </div>
+
+    <div class="panel p-8">
+      <div id="errMsg" class="err mb-5"><i class="fa-solid fa-triangle-exclamation mr-2"></i><span id="errTxt"></span>
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <label>Pseudo</label>
+          <div class="relative">
+            <i class="fa-solid fa-user-ninja absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 text-sm"></i>
+            <input id="username" type="text" placeholder="CyberUser99" class="inp pl-10" autocomplete="username" />
+          </div>
+        </div>
+        <div>
+          <label>Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 text-sm"></i>
+            <input id="email" type="email" placeholder="user@domain.com" class="inp pl-10" autocomplete="email" />
+          </div>
+        </div>
+        <div>
+          <label>Mot de passe</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 text-sm"></i>
+            <input id="password" type="password" placeholder="Min. 8 caractères" class="inp pl-10"
+              autocomplete="new-password" />
+          </div>
+          <div class="strength mt-2">
+            <div id="strengthFill" class="strength-fill" style="width:0"></div>
+          </div>
+          <div class="mt-2 space-y-1">
+            <div class="check" id="c1"><i class="fa-solid fa-xmark"></i> 8 caractères minimum</div>
+            <div class="check" id="c2"><i class="fa-solid fa-xmark"></i> Majuscule + chiffre</div>
+          </div>
+        </div>
+        <div>
+          <label>Confirmer le mot de passe</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock-open absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 text-sm"></i>
+            <input id="confirm" type="password" placeholder="••••••••" class="inp pl-10" autocomplete="new-password" />
+          </div>
+        </div>
+        <button id="signupBtn" class="btn-main mt-2"><i class="fa-solid fa-user-plus mr-2"></i>Créer mon compte</button>
+      </div>
+
+      <div class="mt-6 pt-6 border-t border-zinc-800 text-center text-sm text-zinc-500">
+        <p>Déjà inscrit ? <a href="login.html" style="color:var(--red)" class="hover:underline font-medium">Se
+            connecter</a></p>
+      </div>
+    </div>
+
+    <div class="mt-4 panel p-4 mono text-xs text-zinc-600 text-center">
+      Gratuit · Sans spam · Données non revendues
+    </div>
+  </div>
+
+  <script>
+    const pwd = document.getElementById('password');
+    const fill = document.getElementById('strengthFill');
+    const c1 = document.getElementById('c1');
+    const c2 = document.getElementById('c2');
+    const errMsg = document.getElementById('errMsg');
+    const errTxt = document.getElementById('errTxt');
+
+    pwd.addEventListener('input', () => {
+      const v = pwd.value;
+      const has8 = v.length >= 8;
+      const hasMix = /[A-Z]/.test(v) && /[0-9]/.test(v);
+      setCheck(c1, has8);
+      setCheck(c2, hasMix);
+      const score = (has8 ? 50 : v.length * 5) + (hasMix ? 50 : 0);
+      fill.style.width = Math.min(score, 100) + '%';
+      fill.style.background = score < 40 ? '#ef4444' : score < 80 ? '#f59e0b' : var_green();
+    });
+
+    function var_green() { return '#00ff88'; }
+    function setCheck(el, ok) {
+      el.classList.toggle('ok', ok);
+      el.querySelector('i').className = ok ? 'fa-solid fa-check' : 'fa-solid fa-xmark';
+    }
+
+    document.getElementById('signupBtn').addEventListener('click', () => {
+      const user = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pass = pwd.value;
+      const conf = document.getElementById('confirm').value;
+      if (!user || !email || !pass || !conf) { showErr('Tous les champs sont obligatoires.'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Email invalide.'); return; }
+      if (pass.length < 8) { showErr('Mot de passe trop court (8 caractères minimum).'); return; }
+      if (pass !== conf) { showErr('Les mots de passe ne correspondent pas.'); return; }
+      const btn = document.getElementById('signupBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Création...';
+      btn.disabled = true;
+      setTimeout(() => {
+        localStorage.setItem('cyberhub_user', email);
+        localStorage.setItem('cyberhub_username', user);
+        window.location.href = 'dashboard.html';
+      }, 1000);
+    });
+
+    function showErr(msg) {
+      errTxt.textContent = msg;
+      errMsg.style.display = 'block';
+      setTimeout(() => errMsg.style.display = 'none', 5000);
+    }
+
+    if (localStorage.getItem('cyberhub_user')) window.location.href = 'dashboard.html';
+  </script>
+</body>
+
+</html>
